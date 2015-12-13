@@ -8,6 +8,8 @@
 
 * Líneas, o rango de líneas, con modificaciones:
 
+* Tiempos de ejecución analizados:
+  *(Rellenar la siguiente tabla)*
 
 LIBRERÍA PROBADA | MÉTODO UTILIZADO | TIEMPO DE EJECUCIÓN
 ---------------- | ---------------- | -------------------

@@ -12,6 +12,19 @@
 #include "funcionesD.h"
 #include "funcionesMain.h"
 
+enum TIM_TYPES
+{
+    VACIO   = 1,
+    GAS     = 2,
+    LIQUIDO = 3,
+    SOLIDO  = 4,
+}
+
+enum TIP_TYPES
+{
+    CONVECCION_LIBRE = 1,
+    CONVECCION_FORZADA = 2,
+}
 //******************************************************************************
 //*  ANÁLISIS DE DOS SÓLIDOS ELÁSTICOS TRIDIMENSIONALES EN CONTACTO MEDIANTE   *
 //*  EL MÉTODO DE LOS ELEMENTOS DE CONTORNO. SE CONSIDERAN CARGAS TERMICAS.    *
@@ -31,65 +44,11 @@
 //******************************************************************************
 
 
-int dims=2;
-
-
-void pruebaF(int array[dims][dims])
+int main(int, char*, char*)
 {
-    //array[0] = 1;
-    //array[1] = 2;
-    array[0][0] = 1;
-    array[1][1] = 2;
-    //array[2][2] = 5;
-}
-/**/
-
-/*
-void pruebaF(int** array)
-{
-    //array[0] = 1;
-    //array[1] = 2;
-    array[0][0] = 1;
-    array[1][1] = 2;
-    //array[2][2] = 5;
-}
-/**/
-
-int main(void)
-{
-    //* Declaracion de variables
-
-    /*
-    int** prueba = malloc(2*sizeof(int*));
-    for(int j=0;j<2;j++)
-    prueba[j] = malloc(2*sizeof(int));
-
-
-
-
-    //int prueba[2][2];
-    prueba[0][0] = 14;
-    prueba[1][1] = 24;
-
-    int temp[dims][dims];
-    for(int j=0;j<dims;j++)
-    for(int i=0;i<dims;i++)
-    temp[j][i] = prueba[j][i];
-
-    pruebaF(temp);
-
-    for(int j=0;j<dims;j++)
-    for(int i=0;i<dims;i++)
-    prueba[j][i] = temp[j][i];
-
-
-    printf("%d | %d ",prueba[0][0],prueba[1][1]);
-
-    return 0;
-    /**/
-
     float  tinicio,tfinal;
     int  iCod;
+
     //de solu...
     double  eps;
     int i,j,contador,contres;	//auxiliar
@@ -128,8 +87,7 @@ int main(void)
     leeEntero(in1,&tpcarPP);leeEntero(in1,&tpcarFC);leeEntero(in1,&tpcarFP);leeEntero(in1,&tpcarFL);leeEntero(in1,&tpcarFD);leeLinea(in1);
     //* Lee los flags de simetria
     leeEntero(in1,&simXY);leeEntero(in1,&simXZ);leeEntero(in1,&simYZ);leeLinea(in1);
-    //* Lee el numero de elementos cargados
-    //read(in1,*)nelwA,nelwB   ! ¿Se podría obtener en tiempo de ejecución?
+
     //* Lee las caracteristicas elasticas
     leeDouble(in1,&EA);leeDouble(in1,&nuA);leeDouble(in1,&alA);leeDouble(in1,&EB);leeDouble(in1,&nuB);leeDouble(in1,&alB);leeLinea(in1);
     //* Lee las caracteristicas térmicas
@@ -137,53 +95,52 @@ int main(void)
     //* Lee el tipo de contacto
     leeEntero(in1,&TIM);leeLinea(in1);
     //* Contacto imperfecto
-    if(TIM == 1)    
+    
+    switch(TIM)
     {
-        //VACIO
-        leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);		//acabado superficial de A
-        leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);		//acabado superficial de B
+        case VACIO: //VACIO
+            leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
+            leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
+            break;
+            
+        case GAS: //GAS
+            leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
+            leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
+            leeDouble(in1,&kg);leeDouble(in1,&M0);leeLinea(in1);        //características térmicas del material en la interfase
+            break;
+            
+        case LIQUIDO: //(GREASE, GEL)
+            leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
+            leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
+            leeDouble(in1,&kg);leeLinea(in1);       //características térmicas del material en la interfase
+            break;
+            
+        case SOLIDO: //(POLÍMERO, ADHESIVO, ELASTÓMERO)
+            leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
+            leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
+            leeDouble(in1,&kg);leeDouble(in1,&tTIM);leeDouble(in1,&ETIM);leeLinea(in1);     //características térmicas, mecanicas y espesor del material en la interfase
+            break;
     }
-    else if(TIM == 2)    
-    {
-        //GAS
-        leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);		//acabado superficial de A
-        leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);		//acabado superficial de B
-        leeDouble(in1,&kg);leeDouble(in1,&M0);leeLinea(in1);		//características térmicas del material en la interfase
-    }
-    else if(TIM == 3)    
-    {
-        //LIQUIDO (GREASE, GEL)
-        leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);		//acabado superficial de A
-        leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);		//acabado superficial de B
-        leeDouble(in1,&kg);leeLinea(in1);		//características térmicas del material en la interfase
-    }
-    else if(TIM == 4)    
-    {
-        //SÓLIDO (POLÍMERO, ADHESIVO, ELASTÓMERO)
-        leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);		//acabado superficial de A
-        leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);		//acabado superficial de B
-        leeDouble(in1,&kg);leeDouble(in1,&tTIM);leeDouble(in1,&ETIM);leeLinea(in1);		//características térmicas, mecanicas y espesor del material en la interfase
-    }
+
     //* Materiales intersticiales
     leeEntero(in1,&tip);leeLinea(in1);
 
-    if(tip == 1)    
+    switch (tip)
     {
-        //CONVECCION LIBRE
-        leeDouble(in1,&hflu);leeLinea(in1);		//coeficiente convectivo del material
-
+        case CONVECCION_LIBRE:
+            leeDouble(in1,&hflu);leeLinea(in1);     //coeficiente convectivo del material
+            break;
+        case CONVECCION_FORZADA:
+            leeDouble(in1,&tflu);leeDouble(in1,&hflu);leeLinea(in1);        //temperatura y coeficiente del fluido
+            break;
     }
-    else if(tip == 2)    
-    {
-        //CONVECCION FORZADA
-        leeDouble(in1,&tflu);leeDouble(in1,&hflu);leeLinea(in1);		//temperatura y coeficiente del fluido
-    }
+    
     //* Lee el coeficiente de friccion
     leeDouble(in1,&cf);leeLinea(in1);
     //* Lee tipo de codificacion
     leeEntero(in1,&iCod);leeLinea(in1);
     //* En funcion del tipo de codificacion sigue un camino u otro
-    if(iCod == 0)      
+    if(iCod == 0)
     {
         //* Entrada muy codificada
         CODIFICADA();if(enExcepcion==1)return 0;
@@ -244,9 +201,9 @@ int main(void)
     //* Asigna el numero maximo de iteraciones para la subrutina SPARSE
     nmiter=ngl*10;
     //Se inicializa el vector resistencia térmica de contacto inicial RTC
-    for( i= 1; i<= nelpc; i++)      
+    for( i= 0; i< nelpc; i++)      
     {
-        RTC[i-1]=0.0;
+        RTC[i]=0.0;
     }
     contador=0;
     contres=0;
@@ -261,23 +218,23 @@ int main(void)
     //* Inicializa vector de condiciones de contorno para elementos de la zona potencial de contacto
     //zona de contacto inicial si la resistencia no converge
 
-    for( i=1; i<=nelA; i++)      
+    for( i=0; i<nelA; i++)      
     {
-        if(codA[i-1][1-1] == 9)            
+        if(codA[i][0] == 9)            
         {
-            for( j=1; j<=8; j++)                  
+            for( j=0; j<8; j++)                  
             {
-                ccA[i-1][j-1]=0.0;
+                ccA[i][j]=0.0;
             }
         }
     }
-    for( i=1; i<=nelB; i++)      
+    for( i=0; i<nelB; i++)      
     {
-        if(codB[i-1][1-1] == 9)            
+        if(codB[i][0] == 9)            
         {
-            for( j=1; j<=8; j++)                  
+            for( j=0; j<8; j++)                  
             {
-                ccB[i-1][j-1]=0.0;
+                ccB[i][j]=0.0;
             }
         }
     }
@@ -303,13 +260,6 @@ int main(void)
         printf(" INTERPRETANDO RESULTADOS\n");
         INTERPR();if(enExcepcion==1)return 0;
 
-        //* Escribe los resultados obtenidos
-        //open(unit=out1s,file='interpr.sal')
-
-        //*          call CABECER
-        //call ESCRIBE
-        //close(unit=out1s)
-
         //* Calcula deslizamientos relativos
         DESLIZA();if(enExcepcion==1)return 0;
 
@@ -319,39 +269,25 @@ int main(void)
         //* Escribe los resultados obtenidos
         printf(" ESCRIBIENDO RESULTADOS\n");
 
-        //write(fich_parciales,*) contador
-        //fich_parciales = adjustl(fich_parciales)
-        //fich_parciales = 'parciales'//trim(fich_parciales)//'.sal'
-        //open(unit=out1s,file='parciales.sal')
-
-        //*          call CABECER
-        //call ESCRIBE
 
         //* Chequea los resultados obtenidos
         printf(" CHEQUEANDO RESULTADOS\n");
         CHEQUEO();if(enExcepcion==1)return 0;
 
-        //close(unit=out1s)
-
-        //* Escribe fichero de seguridad
-        //open(UNIT=in6s)
-        //call ESCSEGU
-        //close(UNIT=in6s)
-
         //* Si es necesario, realiza una nueva iteracion
-        if(ifla != 0)            
+        if (ifla)            
         {
             contador=contador+1;
             goto l1000;
         }
     }
     //* Compara resitencia térmicas
-    if(TIM != 0)        
+    if(TIM)        
     {
         if((tpproT == 1) || (tpproTE == 1))            
         {
             COMPRESIS();if(enExcepcion==1)return 0;
-            if(chires != 0)                
+            if(chires)                
             {
                 contador=0;
                 contres=contres+1;

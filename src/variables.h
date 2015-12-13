@@ -126,13 +126,7 @@ double** AT_A;double** AT_B;
 double** BT_A;double** BT_B;
 double** CTE_A;double** CTE_B;
 double** DTE_A;double** DTE_B;
-/*
-double][ allocatable :: AE_A[:][:]][AE_B[:][:]
-double][ allocatable :: BE_A[:][:]][BE_B[:][:]
-double][ allocatable :: AT_A[:][:]][AT_B[:][:]
-double][ allocatable :: BT_A[:][:]][BT_B[:][:]
-double][ allocatable :: CTE_A[:][:]][CTE_B[:][:]
-double][ allocatable :: DTE_A[:][:]][DTE_B[:][:]*/
+
 
 double  a[3*MAX_EL][3*MAX_EL];// Matriz del sistema de ecuaciones
 double  b[3*MAX_EL];// Términos independientes del sistema de ecuaciones

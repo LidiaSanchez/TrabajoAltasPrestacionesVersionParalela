@@ -18,13 +18,14 @@ enum TIM_TYPES
     GAS     = 2,
     LIQUIDO = 3,
     SOLIDO  = 4,
-}
+};
 
 enum TIP_TYPES
 {
     CONVECCION_LIBRE = 1,
     CONVECCION_FORZADA = 2,
-}
+};
+
 //******************************************************************************
 //*  ANÁLISIS DE DOS SÓLIDOS ELÁSTICOS TRIDIMENSIONALES EN CONTACTO MEDIANTE   *
 //*  EL MÉTODO DE LOS ELEMENTOS DE CONTORNO. SE CONSIDERAN CARGAS TERMICAS.    *
@@ -44,7 +45,7 @@ enum TIP_TYPES
 //******************************************************************************
 
 
-int main(int, char*, char*)
+int main(void)
 {
     float  tinicio,tfinal;
     int  iCod;

@@ -1,31 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <string.h>
-
-#include "funcionesPersonales.h"
-#include "variables.h"
-#include "funcionesA.h"
-#include "funcionesB.h"
-#include "funcionesC.h"
-#include "funcionesD.h"
-#include "funcionesMain.h"
-
-enum TIM_TYPES
-{
-    VACIO   = 1,
-    GAS     = 2,
-    LIQUIDO = 3,
-    SOLIDO  = 4,
-};
-
-enum TIP_TYPES
-{
-    CONVECCION_LIBRE = 1,
-    CONVECCION_FORZADA = 2,
-};
-
 //******************************************************************************
 //*  ANÁLISIS DE DOS SÓLIDOS ELÁSTICOS TRIDIMENSIONALES EN CONTACTO MEDIANTE   *
 //*  EL MÉTODO DE LOS ELEMENTOS DE CONTORNO. SE CONSIDERAN CARGAS TERMICAS.    *
@@ -44,6 +16,7 @@ enum TIP_TYPES
 //*                                                                            *
 //******************************************************************************
 
+#include "solidos.h"
 
 int main(void)
 {
@@ -80,7 +53,7 @@ int main(void)
     //* Abre fichero
     in1 = fopen(FICHERO_ENTRADA_COMPLETA, "r");
     //* Lee el titulo del problema a analizar
-    leeCadena(in1,&titulo);
+    leeCadena(in1, titulo);
 
     //* Lee el tipo de problema
     leeEntero(in1,&tpproE);leeEntero(in1,&tpproT);leeEntero(in1,&tpproTE);leeLinea(in1);
@@ -318,15 +291,4 @@ int main(void)
     free(DTE_A);free(DTE_B);
 
     return 0;
-
 }
-//******** FIN DEL PROGRAMA ************
-
-
-
-
-
-
-
-
-

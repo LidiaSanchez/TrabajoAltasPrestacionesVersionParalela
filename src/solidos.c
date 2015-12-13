@@ -231,8 +231,8 @@ int main(void)
     printf("Inicio del proceso. Entrando en SOLUCION\n");
     //* Inicializa variables
 
-    strcpy(nomArchSalTer, "term.dat");
-    strcpy(nomArchSalElas, "elast.dat");
+    strcpy(nomArchSalTer, FICHERO_TERM);
+    strcpy(nomArchSalElas, FICHERO_ELAST);
     eps=1.0E-06;
     ifla=1;
     chires=0;

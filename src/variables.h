@@ -6,6 +6,10 @@
 #define MAX_EL 5000// Máximo número de elementos
 #define MAX_SUB 5000// Máximo número de subelementos
 
+#define FICHERO_ENTRADA_COMPLETA "datos/EntradaCompleta.dat"
+#define FICHERO_TERM "datos/term.dat"
+#define FICHERO_ELAST "datos/elast.dat"
+
 int enExcepcion=0;
 
 char titulo[80];// Título del problema

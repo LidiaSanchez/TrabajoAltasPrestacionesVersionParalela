@@ -1,6 +1,3 @@
-#ifndef FUNCIONESPERSONALES_H_
-#define FUNCIONESPERSONALES_H_
-
 void leeEntero(FILE* fp,int* r)
 {
     fscanf(fp,"%d",&(*r));
@@ -27,5 +24,3 @@ void leeLinea(FILE* fp)
     char temp[80];
     fgets(temp,80,fp);
 }
-#endif /* FUNCIONESPERSONALES_H_ */
-

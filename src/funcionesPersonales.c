@@ -1,3 +1,5 @@
+#include "funcionesPersonales.h"
+
 void leeEntero(FILE* fp,int* r)
 {
     fscanf(fp,"%d",&(*r));

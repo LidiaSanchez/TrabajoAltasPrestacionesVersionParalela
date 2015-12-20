@@ -1,6 +1,3 @@
-#ifndef FUNCIONESMAIN_H_
-#define FUNCIONESMAIN_H_
-
 #include "funcionesPersonales.h"
 #include "variables.h"
 
@@ -8,6 +5,11 @@
 #include "funcionesB.h"
 #include "funcionesC.h"
 #include "funcionesD.h"
+#include <time.h>
+#include <stdlib.h>
+
+#ifndef FUNCIONESMAIN_H_
+#define FUNCIONESMAIN_H_
 
 //******************************************************************************
 //*                                                                            *

@@ -32,6 +32,7 @@ int main(void)
     tinicio = clock()/CLOCKS_PER_SEC;
     printf("Inicio del proceso. Entrando en PREPROCESADOR\n");
     //* Inicializa variables
+    enExcepcion = 0;
     out1=2;
     out2=3;
     out3=4;
@@ -52,9 +53,14 @@ int main(void)
 
     //* Abre fichero
     in1 = fopen(FICHERO_ENTRADA_COMPLETA, "r");
+#ifdef DEBUG
+    printf("[solidos.c] in1 handler: %p\n", &in1);
+#endif    
     //* Lee el titulo del problema a analizar
     leeCadena(in1, titulo);
 
+    printf("Titulo: %s\n", titulo);
+    
     //* Lee el tipo de problema
     leeEntero(in1,&tpproE);leeEntero(in1,&tpproT);leeEntero(in1,&tpproTE);leeLinea(in1);
     //* Lee el tipo de cargas especiales

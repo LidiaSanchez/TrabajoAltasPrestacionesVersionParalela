@@ -1,5 +1,8 @@
-#ifndef FUNCIONESPERSONALES_H
-#define FUNCIONESPERSONALES_H
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifndef FUNCIONESPERSONALES_H_
+#define FUNCIONESPERSONALES_H_
 
 void leeEntero(FILE*,int*);
 void leeDouble(FILE*,double*);

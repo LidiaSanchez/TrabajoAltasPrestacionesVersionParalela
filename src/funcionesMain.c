@@ -105,11 +105,19 @@ void CODIFICADA()
         {
             ccA[i-1][j-1]=ccB[i-1][j-1];
         }
+
         for( j=1; j<=9; j++)        
         {
             locA[i-1][j-1]=locB[i-1][j-1];
         }
     }
+    
+    
+#ifdef DEBUG
+    printf("[funcionesMain.c] locA address: %p\n", locA);
+    printf("[funcionesMain.c] locA[0][0] value: %f\n", locA[0][0]);
+#endif
+    
     //*    WRITE(*,*) 'SOLIDO B'
     //* Lee los datos relativos a la zona libre de "B"
     nele=nelpc+1;

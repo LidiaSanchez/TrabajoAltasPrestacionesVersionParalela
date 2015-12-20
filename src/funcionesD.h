@@ -1,10 +1,9 @@
-#ifndef FUNCIONESD_H_
-#define FUNCIONESD_H_
-
-
 #include "funcionesPersonales.h"
 #include "variables.h"
+#include <math.h>
 
+#ifndef FUNCIONESD_H_
+#define FUNCIONESD_H_
 
 //******************************************************************************
 //*                                                                            *

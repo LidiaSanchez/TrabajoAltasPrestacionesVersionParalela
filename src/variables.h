@@ -211,6 +211,12 @@ extern int  out16;// Fichero de salida
 
 extern int out20;
 
+//* MPI Variables
+
+extern int numproc; // Numero de procesos utilizados
+extern int miId; // Identificador del proceso
+extern int inicioBucle; // Indice del incio del bucle
+extern int finBucle; // Indice final del bucle
+
 
 #endif /* VARIABLES_H_ */
-

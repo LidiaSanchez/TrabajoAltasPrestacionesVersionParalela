@@ -17,8 +17,9 @@
 //******************************************************************************
 
 #include "solidos.h"
+#include <mpi.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
     float  tinicio,tfinal;
     int  iCod;
@@ -27,6 +28,13 @@ int main(void)
     double  eps;
     int i,j,contador,contres;	//auxiliar
     char fich_parciales[80];
+
+    //* Inicializamos MPI
+    MPI_Init(&argc,&argv);
+
+    /* get myid and # of processors */
+    MPI_Comm_size(MPI_COMM_WORLD,&numproc);
+    MPI_Comm_rank(MPI_COMM_WORLD,&miId);
 
     //* Comienzo del programa
     tinicio = clock()/CLOCKS_PER_SEC;
@@ -55,12 +63,12 @@ int main(void)
     in1 = fopen(FICHERO_ENTRADA_COMPLETA, "r");
 #ifdef DEBUG
     printf("[solidos.c] in1 handler: %p\n", &in1);
-#endif    
+#endif
     //* Lee el titulo del problema a analizar
     leeCadena(in1, titulo);
 
     printf("Titulo: %s\n", titulo);
-    
+
     //* Lee el tipo de problema
     leeEntero(in1,&tpproE);leeEntero(in1,&tpproT);leeEntero(in1,&tpproTE);leeLinea(in1);
     //* Lee el tipo de cargas especiales
@@ -75,26 +83,26 @@ int main(void)
     //* Lee el tipo de contacto
     leeEntero(in1,&TIM);leeLinea(in1);
     //* Contacto imperfecto
-    
+
     switch(TIM)
     {
         case VACIO: //VACIO
             leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
             leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
             break;
-            
+
         case GAS: //GAS
             leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
             leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
             leeDouble(in1,&kg);leeDouble(in1,&M0);leeLinea(in1);        //características térmicas del material en la interfase
             break;
-            
+
         case LIQUIDO: //(GREASE, GEL)
             leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
             leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
             leeDouble(in1,&kg);leeLinea(in1);       //características térmicas del material en la interfase
             break;
-            
+
         case SOLIDO: //(POLÍMERO, ADHESIVO, ELASTÓMERO)
             leeDouble(in1,&HAmicro);leeDouble(in1,&sigA);leeDouble(in1,&mA);leeLinea(in1);      //acabado superficial de A
             leeDouble(in1,&HBmicro);leeDouble(in1,&sigB);leeDouble(in1,&mB);leeLinea(in1);      //acabado superficial de B
@@ -114,7 +122,7 @@ int main(void)
             leeDouble(in1,&tflu);leeDouble(in1,&hflu);leeLinea(in1);        //temperatura y coeficiente del fluido
             break;
     }
-    
+
     //* Lee el coeficiente de friccion
     leeDouble(in1,&cf);leeLinea(in1);
     //* Lee tipo de codificacion
@@ -125,7 +133,7 @@ int main(void)
         //* Entrada muy codificada
         CODIFICADA();if(enExcepcion==1)return 0;
     }
-    else      
+    else
     {
         //* Entrada normal ( con cierto tipo de codificacion )
         SEMICODIFICADA();if(enExcepcion==1)return 0;
@@ -155,139 +163,142 @@ int main(void)
     //* Va a la subrutina de cálculo de coeficientes INTEGRAL
     INTEGRAL();if(enExcepcion==1)return 0;
     //==============================================================================
-    //* Final del prep
-    printf("Final del proceso. Saliendo de PREPROCESADOR\n");
-    tfinal = clock()/CLOCKS_PER_SEC;
-    printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
-    //* Formatos
 
-    //* Comienzo de solu...
-    tinicio = clock()/CLOCKS_PER_SEC;
-
-    //* Comienzo del programa
-    printf("Inicio del proceso. Entrando en SOLUCION\n");
-    //* Inicializa variables
-
-    strcpy(nomArchSalTer, FICHERO_TERM);
-    strcpy(nomArchSalElas, FICHERO_ELAST);
-    eps=1.0E-06;
-    ifla=1;
-    chires=0;
-
-    //* Calcula el numero de grados de libertad del problema
-    ngl=3*(nelA+nelB);
-    //* Calcula el numero total de elementos
-    nelT=nelA+nelB;
-    //* Asigna el numero maximo de iteraciones para la subrutina SPARSE
-    nmiter=ngl*10;
-    //Se inicializa el vector resistencia térmica de contacto inicial RTC
-    for( i= 0; i< nelpc; i++)      
+    if (miId == 0)
     {
-        RTC[i]=0.0;
+      //* Final del prep
+      printf("Final del proceso. Saliendo de PREPROCESADOR\n");
+      tfinal = clock()/CLOCKS_PER_SEC;
+      printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
+      //* Formatos
+
+      //* Comienzo de solu...
+      tinicio = clock()/CLOCKS_PER_SEC;
+
+      //* Comienzo del programa
+      printf("Inicio del proceso. Entrando en SOLUCION\n");
+      //* Inicializa variables
+
+      strcpy(nomArchSalTer, FICHERO_TERM);
+      strcpy(nomArchSalElas, FICHERO_ELAST);
+      eps=1.0E-06;
+      ifla=1;
+      chires=0;
+
+      //* Calcula el numero de grados de libertad del problema
+      ngl=3*(nelA+nelB);
+      //* Calcula el numero total de elementos
+      nelT=nelA+nelB;
+      //* Asigna el numero maximo de iteraciones para la subrutina SPARSE
+      nmiter=ngl*10;
+      //Se inicializa el vector resistencia térmica de contacto inicial RTC
+      for( i= 0; i< nelpc; i++)
+      {
+          RTC[i]=0.0;
+      }
+      contador=0;
+      contres=0;
+
+      //* Comienza proceso iterativo
+
+      l1000:    printf("+++++++++++++++++++++ proceso iterativo +++++++++++++++++++++++++ \n");
+
+      printf("iteracion resistencia=%d\n",contres);
+      printf("iteracion elastica=%d\n",contador);
+
+      //* Inicializa vector de condiciones de contorno para elementos de la zona potencial de contacto
+      //zona de contacto inicial si la resistencia no converge
+
+      for( i=0; i<nelA; i++)
+      {
+          if(codA[i][0] == 9)
+          {
+              for( j=0; j<8; j++)
+              {
+                  ccA[i][j]=0.0;
+              }
+          }
+      }
+      for( i=0; i<nelB; i++)
+      {
+          if(codB[i][0] == 9)
+          {
+              for( j=0; j<8; j++)
+              {
+                  ccB[i][j]=0.0;
+              }
+          }
+      }
+      //Se resuelve el problema térmico de potencial
+      if((tpproT == 1) || (tpproTE == 1))
+      {
+          nT=nelT;
+          TERMICO();if(enExcepcion==1)return 0;
+      }
+      if((tpproE == 1) || (tpproTE == 1))
+      {
+          nT=ngl;
+          //* Monta el sistema de ecuaciones
+          printf(" MONTANDO SISTEMA DE ECUACIONES\n");
+          MONTAJE();if(enExcepcion==1)return 0;
+
+          //* Resuelve el sistema de ecuaciones
+          printf(" RESOLVIENDO SISTEMA DE ECUACIONES\n");
+          rsq=0.0;
+          GAUSS_SOLU();if(enExcepcion==1)return 0;
+
+          //* Interpreta los resultados
+          printf(" INTERPRETANDO RESULTADOS\n");
+          INTERPR();if(enExcepcion==1)return 0;
+
+          //* Calcula deslizamientos relativos
+          DESLIZA();if(enExcepcion==1)return 0;
+
+          //* Actualiza el número de incrementos
+          out1=out1+1;
+
+          //* Escribe los resultados obtenidos
+          printf(" ESCRIBIENDO RESULTADOS\n");
+
+
+          //* Chequea los resultados obtenidos
+          printf(" CHEQUEANDO RESULTADOS\n");
+          CHEQUEO();if(enExcepcion==1)return 0;
+
+          //* Si es necesario, realiza una nueva iteracion
+          if (ifla)
+          {
+              contador=contador+1;
+              goto l1000;
+          }
+      }
+      //* Compara resitencia térmicas
+      if(TIM)
+      {
+          if((tpproT == 1) || (tpproTE == 1))
+          {
+              COMPRESIS();if(enExcepcion==1)return 0;
+              if(chires)
+              {
+                  contador=0;
+                  contres=contres+1;
+                  goto l1000;
+              }
+          }
+      }
+      printf("convergencia de resistencia lograda\n");
+
+      //* @@@@@@@@@@@@@@@@@@@@ FIN DEL PROCESO ITERATIVO @@@@@@@@@@@@@@@@@@@@@@
+
+      //* Escribe la solucion definitiva
+      printf(" ESCRIBIENDO LA SOLUCION DEFINITIVA\n");
+      SALIDA_SOLU();if(enExcepcion==1)return 0;
+
+      //* Final del programa
+      printf("Final del proceso. Saliendo de ELASTICO.EXE\n");
+      tfinal = clock()/CLOCKS_PER_SEC;
+      printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
     }
-    contador=0;
-    contres=0;
-
-    //* Comienza proceso iterativo
-
-    l1000:    printf("+++++++++++++++++++++ proceso iterativo +++++++++++++++++++++++++ \n");
-
-    printf("iteracion resistencia=%d\n",contres);
-    printf("iteracion elastica=%d\n",contador);
-
-    //* Inicializa vector de condiciones de contorno para elementos de la zona potencial de contacto
-    //zona de contacto inicial si la resistencia no converge
-
-    for( i=0; i<nelA; i++)      
-    {
-        if(codA[i][0] == 9)            
-        {
-            for( j=0; j<8; j++)                  
-            {
-                ccA[i][j]=0.0;
-            }
-        }
-    }
-    for( i=0; i<nelB; i++)      
-    {
-        if(codB[i][0] == 9)            
-        {
-            for( j=0; j<8; j++)                  
-            {
-                ccB[i][j]=0.0;
-            }
-        }
-    }
-    //Se resuelve el problema térmico de potencial
-    if((tpproT == 1) || (tpproTE == 1))      
-    {
-        nT=nelT;
-        TERMICO();if(enExcepcion==1)return 0;
-    }
-    if((tpproE == 1) || (tpproTE == 1))      
-    {
-        nT=ngl;
-        //* Monta el sistema de ecuaciones
-        printf(" MONTANDO SISTEMA DE ECUACIONES\n");
-        MONTAJE();if(enExcepcion==1)return 0;
-
-        //* Resuelve el sistema de ecuaciones
-        printf(" RESOLVIENDO SISTEMA DE ECUACIONES\n");
-        rsq=0.0;
-        GAUSS_SOLU();if(enExcepcion==1)return 0;
-
-        //* Interpreta los resultados
-        printf(" INTERPRETANDO RESULTADOS\n");
-        INTERPR();if(enExcepcion==1)return 0;
-
-        //* Calcula deslizamientos relativos
-        DESLIZA();if(enExcepcion==1)return 0;
-
-        //* Actualiza el número de incrementos
-        out1=out1+1;
-
-        //* Escribe los resultados obtenidos
-        printf(" ESCRIBIENDO RESULTADOS\n");
-
-
-        //* Chequea los resultados obtenidos
-        printf(" CHEQUEANDO RESULTADOS\n");
-        CHEQUEO();if(enExcepcion==1)return 0;
-
-        //* Si es necesario, realiza una nueva iteracion
-        if (ifla)            
-        {
-            contador=contador+1;
-            goto l1000;
-        }
-    }
-    //* Compara resitencia térmicas
-    if(TIM)        
-    {
-        if((tpproT == 1) || (tpproTE == 1))            
-        {
-            COMPRESIS();if(enExcepcion==1)return 0;
-            if(chires)                
-            {
-                contador=0;
-                contres=contres+1;
-                goto l1000;
-            }
-        }
-    }
-    printf("convergencia de resistencia lograda\n");
-
-    //* @@@@@@@@@@@@@@@@@@@@ FIN DEL PROCESO ITERATIVO @@@@@@@@@@@@@@@@@@@@@@
-
-    //* Escribe la solucion definitiva
-    printf(" ESCRIBIENDO LA SOLUCION DEFINITIVA\n");
-    SALIDA_SOLU();if(enExcepcion==1)return 0;
-
-    //* Final del programa
-    printf("Final del proceso. Saliendo de ELASTICO.EXE\n");
-    tfinal = clock()/CLOCKS_PER_SEC;
-    printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
-
 
     free(AE_A);free(AE_B);
     free(BE_A);free(BE_B);
@@ -295,6 +306,8 @@ int main(void)
     free(BT_A);free(BT_B);
     free(CTE_A);free(CTE_B);
     free(DTE_A);free(DTE_B);
+
+    MPI_Finalize();
 
     return 0;
 }

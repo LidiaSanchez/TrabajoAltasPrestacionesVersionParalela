@@ -195,3 +195,10 @@ int  out15;// Fichero de salida
 int  out16;// Fichero de salida
 
 int out20;
+
+//* MPI variables
+
+int numproc; // Numero de procesos utilizados
+int miId; // Identificador del proceso
+int inicioBucle; // Indice del incio del bucle
+int finBucle; // Indice final del bucle

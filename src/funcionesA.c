@@ -1,4 +1,5 @@
 #include "funcionesA.h"
+#include <mpi.h>
 
 //******************************************************************************
 //*                                                                            *
@@ -32,11 +33,11 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     //* Inicializa variables
     exPri=exInicial;
     elPri=elInicial;
-    
+
 #ifdef DEBUG
     printf("[funcionesA.c] in1 handler: %p\n", &in1);
-#endif    
-    
+#endif
+
     //* Lee valores de la codificacion
     leeEntero(in1,&exAB);leeEntero(in1,&exAD);leeDouble(in1,&rAB);leeDouble(in1,&rAD);leeLinea(in1);
     leeEntero(in1,&tpEl);leeEntero(in1,&fMallado);leeLinea(in1);	//OJO: No se utilizan
@@ -48,7 +49,7 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     printf("[funcionesA.c] rAD value: %f\n", rAD);
     printf("[funcionesA.c] tpEl value: %d\n", tpEl);
     printf("[funcionesA.c] fMallado value: %d\n", fMallado);
-    
+
     printf("[funcionesA.c] ptA[1-1] value: %f\n", ptA[1-1]);
     printf("[funcionesA.c] ptA[2-1] value: %f\n", ptA[2-1]);
     printf("[funcionesA.c] ptA[3-1] value: %f\n", ptA[3-1]);
@@ -58,27 +59,27 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     leeDouble(in1,&ptC[1-1]);leeDouble(in1,&ptC[2-1]);leeDouble(in1,&ptC[3-1]);leeLinea(in1);
     leeDouble(in1,&ptD[1-1]);leeDouble(in1,&ptD[2-1]);leeDouble(in1,&ptD[3-1]);leeLinea(in1);
     //* Calcula los extremos de los elementos
-    for( nexAD=0; nexAD<=exAD; nexAD++)      
+    for( nexAD=0; nexAD<=exAD; nexAD++)
     {
-        if((nexAD == 0) || (rAD == 1.0) )        
+        if((nexAD == 0) || (rAD == 1.0) )
         {
             eta2=-1.0+(2.0/exAD)*nexAD;
         }
-        else        
+        else
         {
             eta2=-1.0+2.0*((pow(rAD,nexAD)-1.0)/(pow(rAD,exAD)-1.0));
         }
-        for( nexAB=0; nexAB<=exAB; nexAB++)        
+        for( nexAB=0; nexAB<=exAB; nexAB++)
         {
-            if((nexAB == 0) || (rAB == 1.0) )          
+            if((nexAB == 0) || (rAB == 1.0) )
             {
                 eta1=-1.0+(2.0/exAB)*nexAB;
             }
-            else          
+            else
             {
                 eta1=-1.0+2.0*((pow(rAB,nexAB)-1.0)/(pow(rAB,exAB)-1.0));
             }
-            for( i=1; i<=3; i++)          
+            for( i=1; i<=3; i++)
             {
                 exB[exInicial-1][i-1]=(ptA[i-1]*(1.0-eta1)*(1.0-eta2)+
                 ptB[i-1]*(1.0+eta1)*(1.0-eta2)+
@@ -94,11 +95,11 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
         }
     }
     //* Genera la tabla de conectividades y segundo eje del sistema local
-    for( nelAD=1; nelAD<=exAD; nelAD++)      
+    for( nelAD=1; nelAD<=exAD; nelAD++)
     {
-        for( nelAB=1; nelAB<=exAB; nelAB++)        
+        for( nelAB=1; nelAB<=exAB; nelAB++)
         {
-            if(bContacto == 1)          
+            if(bContacto == 1)
             {
                 conB[elInicial-1][1-1]=exPri+(nelAD-1)*(exAB+1)+nelAB-1;
                 conB[elInicial-1][2-1]=exPri+(nelAD-1)*(exAB+1)+nelAB+exAB;
@@ -107,13 +108,13 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
                 conA[elInicial-1][2-1]=conB[elInicial-1][3-1];
                 conA[elInicial-1][3-1]=conB[elInicial-1][2-1];
                 modulo=0.0;
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=exB[conB[elInicial-1][2-1]-1][i-1]-exB[conB[elInicial-1][1-1]-1][i-1];
                     modulo=modulo+pow(locB[elInicial-1][3+i-1],2);
                 }
                 modulo=sqrt(modulo);
-                for( i=4; i<=6; i++)            
+                for( i=4; i<=6; i++)
                 {
                     locB[elInicial-1][i-1]=locB[elInicial-1][i-1]/modulo;
                     locA[elInicial-1][i-1]=locB[elInicial-1][i-1];
@@ -126,32 +127,32 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
                 conA[elInicial-1][2-1]=conB[elInicial-1][3-1];
                 conA[elInicial-1][3-1]=conB[elInicial-1][2-1];
                 modulo=0.0;
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=exB[conB[elInicial-1][1-1]-1][i-1]-exB[conB[elInicial-1][2-1]-1][i-1];
                     modulo=modulo+pow(locB[elInicial-1][3+i-1],2);
                 }
                 modulo=sqrt(modulo);
-                for( i=4; i<=6; i++)            
+                for( i=4; i<=6; i++)
                 {
                     locB[elInicial-1][i-1]=locB[elInicial-1][i-1]/modulo;
                     locA[elInicial-1][i-1]=locB[elInicial-1][i-1];
                 }
                 elInicial=elInicial+1;
             }
-            else          
+            else
             {
                 conB[elInicial-1][1-1]=exPri+(nelAD-1)*(exAB+1)+nelAB-1;
                 conB[elInicial-1][2-1]=exPri+(nelAD-1)*(exAB+1)+nelAB;
                 conB[elInicial-1][3-1]=exPri+(nelAD-1)*(exAB+1)+nelAB+exAB;
                 modulo=0.0;
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=exB[conB[elInicial-1][2-1]-1][i-1]-exB[conB[elInicial-1][1-1]-1][i-1];
                     modulo=modulo+pow(locB[elInicial-1][3+i-1],2);
                 }
                 modulo=sqrt(modulo);
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=locB[elInicial-1][3+i-1]/modulo;
                 }
@@ -160,13 +161,13 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
                 conB[elInicial-1][2-1]=exPri+(nelAD-1)*(exAB+1)+nelAB+exAB;
                 conB[elInicial-1][3-1]=exPri+(nelAD-1)*(exAB+1)+nelAB;
                 modulo=0.0;
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=exB[conB[elInicial-1][1-1]-1][i-1]-exB[conB[elInicial-1][2-1]-1][i-1];
                     modulo=modulo+pow(locB[elInicial-1][3+i-1],2);
                 }
                 modulo=sqrt(modulo);
-                for( i=1; i<=3; i++)            
+                for( i=1; i<=3; i++)
                 {
                     locB[elInicial-1][3+i-1]=locB[elInicial-1][3+i-1]/modulo;
                 }
@@ -223,13 +224,13 @@ void LEE_CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal)
     int ndInicial=*punteroA_ndInicial,ndFinal=*punteroA_ndFinal;	//Nodos inicial y final
     int  tpCod;	//Auxiliares
     //* Codigos elasticos
-    if((tpproE == 1) || (tpproTE == 1))      
+    if((tpproE == 1) || (tpproTE == 1))
     {
         tpCod=1;
         CODIGOS(&ndInicial,& ndFinal,&tpCod);if(enExcepcion==1)return;
     }
     //* Codigos termicos
-    if((tpproT == 1) || (tpproTE == 1))      
+    if((tpproT == 1) || (tpproTE == 1))
     {
         tpCod=2;
         CODIGOS(&ndInicial,& ndFinal,&tpCod);if(enExcepcion==1)return;
@@ -256,82 +257,82 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
     int  ndUlt,ndAct,nd,i;	//Auxiliares
     double  dat1, dat2,dat3;
     //* Condiciones de contorno elasticas
-    if((tpproE == 1) || (tpproTE == 1))      
+    if((tpproE == 1) || (tpproTE == 1))
     {
         ndAct = ndInicial;
         while(ndAct <= ndFinal)
         {
             leeEntero(in1,&ndUlt);leeDouble(in1,&dat1);leeDouble(in1,&dat2);leeDouble(in1,&dat3);leeLinea(in1);
-            if((ndUlt < ndAct) || (ndUlt > ndFinal))          
+            if((ndUlt < ndAct) || (ndUlt > ndFinal))
             {
                 printf(" Nodo = %d Dato 1 = %e Dato 2 = %e Dato 3 = %e\n",ndUlt,dat1,dat2,dat3);
                 printf("***ERROR*** => ERROR EN CONDICIONES DE CONTORNO\n"); enExcepcion=1;return;
             }
-            for( nd=ndAct; nd<=ndUlt; nd++)          
+            for( nd=ndAct; nd<=ndUlt; nd++)
             {
                 //* Inicializa valores de las condiciones de contorno
-                for( i=1; i<=10; i++)            
+                for( i=1; i<=10; i++)
                 {
                     ccB[nd-1][i-1]=0.0;
                 }
                 //* Asigna las condiciones de contorno
-                if(codB[nd-1][1-1] == 1)            
+                if(codB[nd-1][1-1] == 1)
                 {
                     //* Codigo 1
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 2)            
+                else if(codB[nd-1][1-1] == 2)
                 {
                     //* Codigo 2
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 3)            
+                else if(codB[nd-1][1-1] == 3)
                 {
                     //* Codigo 3
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 4)            
+                else if(codB[nd-1][1-1] == 4)
                 {
                     //* Codigo 4
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 5)            
+                else if(codB[nd-1][1-1] == 5)
                 {
                     //* Codigo 5
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 6)            
+                else if(codB[nd-1][1-1] == 6)
                 {
                     //* Codigo 6
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 7)            
+                else if(codB[nd-1][1-1] == 7)
                 {
                     //* Codigo 7
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
-                else if(codB[nd-1][1-1] == 8)            
+                else if(codB[nd-1][1-1] == 8)
                 {
                     //* Codigo 8
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
-                else            
+                else
                 {
                     printf(" Nodo = %d Codigo = %d\n",nd,codB[nd-1][1-1]);
                     printf("***ERROR*** => ERROR EN CONDICIONES DE CONTORNO ELASTICAS\n"); enExcepcion=1;return;
@@ -341,37 +342,37 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
         }
     }
     //* Condiciones de contorno termicas
-    if((tpproT == 1) || (tpproTE == 1))      
+    if((tpproT == 1) || (tpproTE == 1))
     {
         ndAct = ndInicial;
         while(ndAct <= ndFinal)
         {
             leeEntero(in1,&ndUlt);leeDouble(in1,&dat1);leeDouble(in1,&dat2);leeLinea(in1);
-            if((ndUlt < ndAct) || (ndUlt > ndFinal))          
+            if((ndUlt < ndAct) || (ndUlt > ndFinal))
             {
                 printf("%d Dato 1 = %e Dato 2 = %e Dato 3 = %e\n",ndUlt,dat1,dat2,dat3);
                 printf("***ERROR*** => ERROR EN CONDICIONES DE CONTORNO\n"); enExcepcion=1;return;
             }
-            for( nd=ndAct; nd<=ndUlt; nd++)          
+            for( nd=ndAct; nd<=ndUlt; nd++)
             {
                 //* Asigna las condiciones de contorno
-                if(codB[nd-1][2-1] == 1)            
+                if(codB[nd-1][2-1] == 1)
                 {
                     //* Codigo 1
                     ccB[nd-1][7-1]=dat1;
                 }
-                else if(codB[nd-1][2-1] == 2)            
+                else if(codB[nd-1][2-1] == 2)
                 {
                     //* Codigo 2
                     ccB[nd-1][8-1]=dat1;
                 }
-                else if(codB[nd-1][2-1] == 4)            
+                else if(codB[nd-1][2-1] == 4)
                 {
                     //* Codigo 4
                     ccB[nd-1][9-1]=dat1;
                     ccB[nd-1][10-1]=dat2;
                 }
-                else            
+                else
                 {
                     printf(" Nodo = %d Codigo = %d\n",nd,codB[nd-1][2-1]);
                     printf("***ERROR*** => ERROR EN CONDICIONES DE CONTORNO TERMICAS\n"); enExcepcion=1;return;
@@ -398,24 +399,24 @@ void CALCNODOS()
 
     int  i,j,k;	//Auxiliares
     //* Calcula los nodos de "A"
-    for( i=1; i<=nelA; i++)      
+    for( i=1; i<=nelA; i++)
     {
-        for( j=1; j<=3; j++)        
+        for( j=1; j<=3; j++)
         {
             ndA[i-1][j-1]=0.;
-            for( k=1; k<=3; k++)          
+            for( k=1; k<=3; k++)
             {
                 ndA[i-1][j-1]=ndA[i-1][j-1]+exA[conA[i-1][k-1]-1][j-1]/3.;
             }
         }
     }
     //* Calcula los nodos de "B"
-    for( i=1; i<=nelB; i++)      
+    for( i=1; i<=nelB; i++)
     {
-        for( j=1; j<=3; j++)        
+        for( j=1; j<=3; j++)
         {
             ndB[i-1][j-1]=0.;
-            for( k=1; k<=3; k++)          
+            for( k=1; k<=3; k++)
             {
                 ndB[i-1][j-1]=ndB[i-1][j-1]+exB[conB[i-1][k-1]-1][j-1]/3.;
             }
@@ -440,9 +441,9 @@ void SISTLOCAL()
     int  i,j;	//Auxiliares
     double  xx[3],yy[3],zz[3],modulo;
     //* Calcula el vector normal de "A" ( Eje 1 )
-    for( i=1; i<=nelA; i++)      
+    for( i=1; i<=nelA; i++)
     {
-        for( j=1; j<=3; j++)        
+        for( j=1; j<=3; j++)
         {
             xx[j-1]= exA[conA[i-1][j-1]-1][1-1];
             yy[j-1]= exA[conA[i-1][j-1]-1][2-1];
@@ -450,40 +451,40 @@ void SISTLOCAL()
 #ifdef DEBUG
             printf("[funcionesA.c] conA[%d-1][%d-1] value: %d\n", i, j, conA[i-1][j-1]);
             printf("[funcionesA.c] exA[conA[%d-1][%d-1]-1][1-1] value: %f\n", i, j, exA[conA[i-1][j-1]-1][1-1]);
-#endif 
+#endif
         }
         locA[i-1][1-1]=(yy[2-1]-yy[1-1])*(zz[3-1]-zz[1-1])-(zz[2-1]-zz[1-1])*(yy[3-1]-yy[1-1]);
         locA[i-1][2-1]=(zz[2-1]-zz[1-1])*(xx[3-1]-xx[1-1])-(xx[2-1]-xx[1-1])*(zz[3-1]-zz[1-1]);
         locA[i-1][3-1]=(xx[2-1]-xx[1-1])*(yy[3-1]-yy[1-1])-(yy[2-1]-yy[1-1])*(xx[3-1]-xx[1-1]);
-        
+
 #ifdef DEBUG
         printf("[funcionesA.c] locA address: %p\n", locA);
         printf("[funcionesA.c] locA[0][2] value: %f\n", locA[0][2]);
 #endif
-        
+
         modulo=sqrt(pow(locA[i-1][1-1],2)+pow(locA[i-1][2-1],2)+pow(locA[i-1][3-1],2));
-        if(modulo != 0.0 )        
+        if(modulo != 0.0 )
         {
             locA[i-1][1-1]=locA[i-1][1-1]/modulo;
             locA[i-1][2-1]=locA[i-1][2-1]/modulo;
             locA[i-1][3-1]=locA[i-1][3-1]/modulo;
         }
-        else        
+        else
         {
             printf("*** ERROR*** => MODULO NULO EN SISTEMA LOCAL. SOLIDO A\n"); enExcepcion=1;return;
         }
     }
     //* Calcula la tercera direccion local de "A"
-    for( i=1; i<=nelA; i++)      
+    for( i=1; i<=nelA; i++)
     {
         locA[i-1][7-1]=locA[i-1][2-1]*locA[i-1][6-1]-locA[i-1][3-1]*locA[i-1][5-1];
         locA[i-1][8-1]=locA[i-1][3-1]*locA[i-1][4-1]-locA[i-1][1-1]*locA[i-1][6-1];
         locA[i-1][9-1]=locA[i-1][1-1]*locA[i-1][5-1]-locA[i-1][2-1]*locA[i-1][4-1];
     }
     //* Calcula el vector normal de "B" ( Eje 1 )
-    for( i=1; i<=nelB; i++)      
+    for( i=1; i<=nelB; i++)
     {
-        for( j=1; j<=3; j++)        
+        for( j=1; j<=3; j++)
         {
             xx[j-1]= exB[conB[i-1][j-1]-1][1-1];
             yy[j-1]= exB[conB[i-1][j-1]-1][2-1];
@@ -493,19 +494,19 @@ void SISTLOCAL()
         locB[i-1][2-1]=(zz[2-1]-zz[1-1])*(xx[3-1]-xx[1-1])-(xx[2-1]-xx[1-1])*(zz[3-1]-zz[1-1]);
         locB[i-1][3-1]=(xx[2-1]-xx[1-1])*(yy[3-1]-yy[1-1])-(yy[2-1]-yy[1-1])*(xx[3-1]-xx[1-1]);
         modulo=sqrt(pow(locB[i-1][1-1],2)+pow(locB[i-1][2-1],2)+pow(locB[i-1][3-1],2));
-        if(modulo != 0.0 )        
+        if(modulo != 0.0 )
         {
             locB[i-1][1-1]=locB[i-1][1-1]/modulo;
             locB[i-1][2-1]=locB[i-1][2-1]/modulo;
             locB[i-1][3-1]=locB[i-1][3-1]/modulo;
         }
-        else        
+        else
         {
             printf("*** ERROR*** => MODULO NULO EN SISTEMA LOCAL. SOLIDO B\n"); enExcepcion=1;return;
         }
     }
     //* Calcula la tercera direccion local de "B"
-    for( i=1; i<=nelB; i++)      
+    for( i=1; i<=nelB; i++)
     {
         locB[i-1][7-1]=locB[i-1][2-1]*locB[i-1][6-1]-locB[i-1][3-1]*locB[i-1][5-1];
         locB[i-1][8-1]=locB[i-1][3-1]*locB[i-1][4-1]-locB[i-1][1-1]*locB[i-1][6-1];
@@ -555,43 +556,57 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
     //cte4=4.D0*3.141592654D0
     //cte5=alT*(1.D0+nuT)/(8.D0*3.141592654D0*(1.D0-nuT))
 
+    //* Obtenemos los indices para buscar en los bucles
+    inicioBucle = (nelT / numproc) * miId;
+    if (nelT % numproc > miId)
+    {
+      inicioBucle += miId;
+      finBucle = inicioBucle + (nelT / numproc) + 1;
+    }
+    else
+    {
+      inicioBucle += nelT % numproc;
+      finBucle = inicioBucle + (nelT / numproc);
+    }
+    printf("Numero total elementos: %d\n",nelT);
+    printf("Proceso: %d %d ~ %d\n",miId,inicioBucle,finBucle);
 
     //* Caso en que no haya simetria implicita ++++++++++++++++++++++++++++++++++++++++++++++++
-    if((simXY != 1) && (simXZ != 1) && (simYZ != 1))                
+    if((simXY != 1) && (simXZ != 1) && (simYZ != 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
                 INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
 
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
                     //* Cambia de coordenadas los coeficientes elasticos
                     TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
@@ -611,39 +626,41 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //write(out16,*)'Elemento:',nd,el
                 //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso en que haya simetria respecto del plano OXY ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY == 1) && (simXZ != 1) && (simYZ != 1))                
+    else if((simXY == 1) && (simXZ != 1) && (simYZ != 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -653,22 +670,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra SIMÉTRICO OXY
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                         
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                            
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                                
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                                
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -680,18 +697,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Combina coeficientes
                 //* Elásticos
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
-                        for( j=1; j<=3; j++)                              
+                        for( j=1; j<=3; j++)
                         {
-                            if(j == 3)                                 
+                            if(j == 3)
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
                             }
-                            else                                 
+                            else
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
@@ -699,18 +716,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     //* Térmoelásticos
-                    if(tpproTE == 1)                           
+                    if(tpproTE == 1)
                     {
-                        for( i=1; i<=3; i++)                               
+                        for( i=1; i<=3; i++)
                         {
                             CTE[i-1]=CTE[i-1]+C1[i-1];
-                            for( j=1; j<=3; j++)                                  
+                            for( j=1; j<=3; j++)
                             {
-                                if(j == 3)                                     
+                                if(j == 3)
                                 {
                                     DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
                                 }
-                                else                                     
+                                else
                                 {
                                     DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
                                 }
@@ -721,7 +738,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
                 }
                 //* Térmicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1;
                     BT=BT+BT1;
@@ -746,34 +763,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso de que haya simetria respecto del plano OXZ ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY != 1) && (simXZ == 1) && (simYZ != 1))                
+    else if((simXY != 1) && (simXZ == 1) && (simYZ != 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -783,22 +800,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -810,18 +827,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elásticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
-                        for( j=1; j<=3; j++)                              
+                        for( j=1; j<=3; j++)
                         {
-                            if(j == 2)                                 
+                            if(j == 2)
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
                             }
-                            else                                 
+                            else
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
@@ -829,18 +846,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     //* Térmoelásticos
-                    if(tpproTE == 1)                           
+                    if(tpproTE == 1)
                     {
-                        for( i=1; i<=3; i++)                              
+                        for( i=1; i<=3; i++)
                         {
                             CTE[i-1]=CTE[i-1]+C1[i-1];
-                            for( j=1; j<=3; j++)                                 
+                            for( j=1; j<=3; j++)
                             {
-                                if(j == 2)                                    
+                                if(j == 2)
                                 {
                                     DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
                                 }
-                                else                                    
+                                else
                                 {
                                     DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
                                 }
@@ -851,7 +868,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
                 }
                 //* Térmicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1;
                     BT=BT+BT1;
@@ -876,34 +893,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso de que haya simetria respecto del plano OYZ ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY != 1) && (simXZ != 1) && (simYZ == 1))                
+    else if((simXY != 1) && (simXZ != 1) && (simYZ == 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -913,22 +930,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -939,18 +956,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elasticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
-                        for( j=1; j<=3; j++)                              
+                        for( j=1; j<=3; j++)
                         {
-                            if(j == 1)                                 
+                            if(j == 1)
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
                             }
-                            else                                 
+                            else
                             {
                                 AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
                                 BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
@@ -959,18 +976,18 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Térmoelásticos
-                if(tpproTE == 1)                        
+                if(tpproTE == 1)
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         CTE[i-1]=CTE[i-1]+C1[i-1];
-                        for( j=1; j<=3; j++)                              
+                        for( j=1; j<=3; j++)
                         {
-                            if(j == 1)                                 
+                            if(j == 1)
                             {
                                 DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
                             }
-                            else                                 
+                            else
                             {
                                 DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
                             }
@@ -981,7 +998,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
 
                 //* Térmicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1;
                     BT=BT+BT1;
@@ -1006,34 +1023,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso de simetria respecto de los planos OXY y OXZ ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY == 1) && (simXZ == 1) && (simYZ != 1))                
+    else if((simXY == 1) && (simXZ == 1) && (simYZ != 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -1043,22 +1060,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                              
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1071,15 +1088,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy y Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1090,15 +1107,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1108,9 +1125,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elasticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]+AE3[i-1][1-1];
                         AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
@@ -1121,9 +1138,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Térmoelásticos
-                if(tpproTE == 1)                        
+                if(tpproTE == 1)
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]+D3[i-1][1-1];
                         DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
@@ -1133,7 +1150,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Cambia de coordenadas los coeficientes elasticos
                 TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
                 //* Térmicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1+AT2+AT3;
                     BT=BT+BT1+BT2+BT3;
@@ -1158,34 +1175,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso de simetria respecto de los planos OXY y OYZ ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY == 1) && (simXZ != 1) && (simYZ == 1))                
+    else if((simXY == 1) && (simXZ != 1) && (simYZ == 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -1195,22 +1212,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                              
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1223,15 +1240,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy y Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1242,22 +1259,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1267,9 +1284,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elasticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]-AE2[i-1][1-1]-AE3[i-1][1-1];
                         AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]+AE2[i-1][2-1]+AE3[i-1][2-1];
@@ -1280,12 +1297,12 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Térmoelásticos
-                if(tpproTE == 1)                        
+                if(tpproTE == 1)
                 {
                     CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
                     CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
                     CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]-D2[i-1][1-1]-D3[i-1][1-1];
                         DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]+D2[i-1][2-1]+D3[i-1][2-1];
@@ -1295,7 +1312,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Cambia de coordenadas los coeficientes elasticos
                 TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
                 //* Térmicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1+AT2+AT3;
                     BT=BT+BT1+BT2+BT3;
@@ -1320,34 +1337,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso de simetria respecto de los planos OXZ y OYZ ++++++++++++++++++++++++++++++++++++++++
     }
-    else if((simXY != 1) && (simXZ == 1) && (simYZ == 1))                
+    else if((simXY != 1) && (simXZ == 1) && (simYZ == 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -1361,22 +1378,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1393,15 +1410,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz y Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                              
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1416,22 +1433,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1445,9 +1462,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elasticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         AE[i-1][1-1]=AE[i-1][1-1]-AE1[i-1][1-1]-AE2[i-1][1-1]+AE3[i-1][1-1];
                         AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
@@ -1458,12 +1475,12 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Térmoelásticos
-                if(tpproTE == 1)                        
+                if(tpproTE == 1)
                 {
                     CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
                     CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
                     CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         DTE[i-1][1-1]=DTE[i-1][1-1]-D1[i-1][1-1]-D2[i-1][1-1]+D3[i-1][1-1];
                         DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
@@ -1480,14 +1497,14 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //write(out11,*) 'transforma',AE(1,1),AE(1,2),AE(1,3),AE(2,1),AE(2,2),AE(2,3),AE(3,1),AE(3,2),AE(3,3)
                 //endif
                 //* Termicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1+AT2+AT3;
                     BT=BT+BT1+BT2+BT3;
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                if(nd == 1)					
+                if(nd == 1)
                 {
                     printf("Elemento:%7d%7d\n",nd,el);
                 }
@@ -1510,34 +1527,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
         }
         //* Caso en que haya simetria respecto de los tres planos coordenados ++++++++++++++++++++++++++++++++
     }
-    else if((simXY == 1) && (simXZ == 1) && (simYZ == 1))                
+    else if((simXY == 1) && (simXZ == 1) && (simYZ == 1))
     {
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-        for( el=1; el<=nelT; el++)	      	
+        for( el = inicioBucle; el <= finBucle; el++)
         {
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-            for( nd=1; nd<=nelT; nd++)	           
+            for( nd = inicioBucle; nd <= finBucle; nd++)
             {
                 //* Asigna punto de colocacion
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
                     ndCol[i-1]=ndT[nd-1][i-1];
                 }
                 //* Asigna tipo de integral
-                if(el == nd)	                
+                if(el == nd)
                 {
                     intenum = 0;
                 }
-                else	                
+                else
                 {
                     intenum = 1;
                 }
                 //* Integra NORMAL
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)	                
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)	                   
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
@@ -1547,22 +1564,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                              
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1575,15 +1592,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy y Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1594,15 +1611,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy,Oxz y Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
                         extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1613,22 +1630,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1639,15 +1656,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxz y Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 3)                              
+                        if(j == 3)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1658,22 +1675,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 1)                              
+                        if(j == 1)
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                 }
                 //* Intercambia extremos 2 y 3
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
                     extraux=extr[2-1][i-1];
                     extr[2-1][i-1]=extr[3-1][i-1];
@@ -1684,15 +1701,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Integra simetrico Oxy y Oyz
 
                 //* Asigna extremos
-                for( i=1; i<=3; i++)                        
+                for( i=1; i<=3; i++)
                 {
-                    for( j=1; j<=3; j++)                           
+                    for( j=1; j<=3; j++)
                     {
-                        if(j == 2)                              
+                        if(j == 2)
                         {
                             extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                         }
-                        else                              
+                        else
                         {
                             extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
@@ -1702,9 +1719,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
                 //* Elasticos
                 //* Combina coeficientes
-                if((tpproE == 1) || (tpproTE == 1))                        
+                if((tpproE == 1) || (tpproTE == 1))
                 {
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]-AE3[i-1][1-1]+AE4[i-1][1-1]-AE5[i-1][1-1]-AE6[i-1][1-1]-AE7[i-1][1-1];
                         AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1]-AE4[i-1][2-1]-AE5[i-1][2-1]+AE6[i-1][2-1]+AE7[i-1][2-1];
@@ -1715,12 +1732,12 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Térmoelásticos
-                if(tpproTE == 1)                        
+                if(tpproTE == 1)
                 {
                     CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1]+C4[1-1]+C5[1-1]+C6[1-1]+C7[1-1];
                     CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1]+C4[2-1]+C5[2-1]+C6[2-1]+C7[2-1];
                     CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1]+C4[3-1]+C5[3-1]+C6[3-1]+C7[3-1];
-                    for( i=1; i<=3; i++)                           
+                    for( i=1; i<=3; i++)
                     {
                         DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]-D3[i-1][1-1]+D4[i-1][1-1]-D5[i-1][1-1]-D6[i-1][1-1]-D7[i-1][1-1];
                         DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1]-D4[i-1][1-1]-D5[i-1][1-1]+D6[i-1][1-1]+D7[i-1][1-1];
@@ -1730,7 +1747,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 //* Cambia de coordenadas los coeficientes elasticos
                 TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
                 //* Termicos
-                if((tpproT == 1) || (tpproTE == 1))                        
+                if((tpproT == 1) || (tpproTE == 1))
                 {
                     AT=AT+AT1+AT2+AT3+AT4+AT5+AT6+AT7;
                     BT=BT+BT1+BT2+BT3+BT4+BT5+BT6+BT7;
@@ -1754,7 +1771,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
             }
         }
     }
-    else                
+    else
     {
         //* No hay mas casos de simetria
         printf(" **** ERROR **** => Simetrias erroneas\n"); enExcepcion=1;return;
@@ -1777,10 +1794,10 @@ void MONTAJETER()
 
     int i,j;	//auxiliar
     //* Inicializa los valores de los coeficientes
-    for( i=1; i<= nelT; i++)    
+    for( i=1; i<= nelT; i++)
     {
         b[i-1]=0.0;
-        for( j=1; j<=nelT; j++)      
+        for( j=1; j<=nelT; j++)
         {
             a[i-1][j-1]=0.0;
         }
@@ -1788,7 +1805,7 @@ void MONTAJETER()
     //* CUERPO A
 
     nel=nelA;
-    for( i=1; i<=nel; i++)    
+    for( i=1; i<=nel; i++)
     {
         codT[i-1]=codA[i-1][2-1];
         temp[i-1]=ccA[i-1][7-1];
@@ -1802,31 +1819,31 @@ void MONTAJETER()
     //open(unit=in2s,file='coe_BT_A.dat',status='unknown',access='direct',form='unformatted',recl=72)
 
     //* lee coeficientes de la ecuacion
-    for( i=1; i<=nel; i++)    
+    for( i=1; i<=nel; i++)
     {
-        for( j=1; j<=nel; j++)      
+        for( j=1; j<=nel; j++)
         {
             //reg=(j-1)*nel+i
             //read(unit=in1s,rec=reg)AT
             //read(unit=in2s,rec=reg)BT
             AT = AT_A[j-1][i-1];
             BT = BT_A[j-1][i-1];
-            if(codT[j-1] == 1)        
+            if(codT[j-1] == 1)
             {
                 b[i-1]=b[i-1]-AT*temp[j-1];
                 a[i-1][j-1]=-BT;
             }
-            if(codT[j-1] == 2)        
+            if(codT[j-1] == 2)
             {
                 b[i-1]=b[i-1]+BT*fluj[j-1];
                 a[i-1][j-1]=AT;
             }
-            if(codT[j-1] == 4)        
+            if(codT[j-1] == 4)
             {
                 b[i-1]=b[i-1]+BT*hf[j-1]/lamA*tf[j-1];
                 a[i-1][j-1]=AT+BT*hf[j-1]/lamA;
             }
-            if((codT[j-1] == 3) || (codT[j-1] == 5))        
+            if((codT[j-1] == 3) || (codT[j-1] == 5))
             {
                 a[i-1][j-1]=AT;
                 a[i-1][j+nelA-1]=lamB/lamA*BT;
@@ -1839,7 +1856,7 @@ void MONTAJETER()
     //* CUERPO B
 
     nel=nelB;
-    for( i=1; i<=nel; i++)    
+    for( i=1; i<=nel; i++)
     {
         codT[i-1]=codB[i-1][2-1];
         temp[i-1]=ccB[i-1][7-1];
@@ -1853,9 +1870,9 @@ void MONTAJETER()
     //open(unit=in4s,file='coe_BT_B.dat',status='unknown',access='direct',form='unformatted',recl=72)
 
     //* lee coeficientes de la ecuacion
-    for( i=1; i<=nel; i++)    
+    for( i=1; i<=nel; i++)
     {
-        for( j=1; j<=nel; j++)      
+        for( j=1; j<=nel; j++)
         {
             //reg=(j-1)*nel+i
             //read(unit=in3s,rec=reg)AT
@@ -1863,22 +1880,22 @@ void MONTAJETER()
             AT = AT_B[j-1][i-1];
             BT = BT_B[j-1][i-1];
 
-            if(codT[j-1] == 1)        
+            if(codT[j-1] == 1)
             {
                 b[i+nelA-1]=b[i+nelA-1]-AT*temp[j-1];
                 a[i+nelA-1][j+nelA-1]=-BT;
             }
-            if(codT[j-1] == 2)        
+            if(codT[j-1] == 2)
             {
                 b[i+nelA-1]=b[i+nelA-1]+BT*fluj[j-1];
                 a[i+nelA-1][j+nelA-1]=AT;
             }
-            if(codT[j-1] == 4)        
+            if(codT[j-1] == 4)
             {
                 b[i+nelA-1]=b[i+nelA-1]+BT*hf[j-1]/lamB*tf[j-1];
                 a[i+nelA-1][j+nelA-1]=AT+BT*hf[j-1]/lamB;
             }
-            if((codT[j-1] == 3) || (codT[j-1] == 5))        
+            if((codT[j-1] == 3) || (codT[j-1] == 5))
             {
                 //* Este termino incluye el contacto imperfecto y la resistencia debida a un material intermedio
                 a[i+nelA-1][j-1]=AT;
@@ -1922,43 +1939,43 @@ void GAUSS_SOLU()
     //close(unit=out20)
 
     //MATRIZ AMPLIADA
-    for( i=1; i<=nT; i++)        
+    for( i=1; i<=nT; i++)
     {
         a[i-1][nT+1-1]=b[i-1];
     }
     //inicializamos variables
-    for( i=1; i<=nT; i++)        
+    for( i=1; i<=nT; i++)
     {
         x[i-1]=0.0;
     }
     //busqueda del pivote
-    for( i=1; i<=nT-1; i++)        
+    for( i=1; i<=nT-1; i++)
     {
         piv=0.0;
-        for( j=i; j<=nT; j++)            
+        for( j=i; j<=nT; j++)
         {
-            if(fabs(a[j-1][i-1]) > piv)                
+            if(fabs(a[j-1][i-1]) > piv)
             {
                 piv=fabs(a[j-1][i-1]);
                 np=j;
             }
         }
         //chequeo matriz singular
-        if(piv == 0.0 )            
+        if(piv == 0.0 )
         {
             printf("######### matriz singular #########\n");
             printf("\n"); enExcepcion=1;return;
         }
         //intercambio de filas
-        for( j=i; j<=nT+1; j++)            
+        for( j=i; j<=nT+1; j++)
         {
             maxi=a[np-1][j-1];
             a[np-1][j-1]=a[i-1][j-1];
             a[i-1][j-1]=maxi;
         }
-        for( j=i+1; j<=nT; j++)            
+        for( j=i+1; j<=nT; j++)
         {
-            for( k=i+1; k<=nT+1; k++)                
+            for( k=i+1; k<=nT+1; k++)
             {
                 a[j-1][k-1]=a[j-1][k-1]-a[i-1][k-1]*a[j-1][i-1]/a[i-1][i-1];
             }
@@ -1967,12 +1984,12 @@ void GAUSS_SOLU()
     printf(" COMIENZA PROCESO DE SOLUCION\n");
 
     //resolucion hacia atras
-    for( i=nT; i>=1; i+=-1)        
+    for( i=nT; i>=1; i+=-1)
     {
         maxi=0.0;
-        if(i != nT)            
+        if(i != nT)
         {
-            for( j=i; j<=nT; j++)                
+            for( j=i; j<=nT; j++)
             {
                 maxi=maxi+a[i-1][j-1]*x[j-1];
             }
@@ -2008,7 +2025,7 @@ void CONTORNOTER()
 
     int i;
     //* CUERPO A
-    for( i=1; i<=nelA; i++)    
+    for( i=1; i<=nelA; i++)
     {
         codT[i-1]=codA[i-1][2-1];
         tempA[i-1]=ccA[i-1][7-1];
@@ -2017,29 +2034,29 @@ void CONTORNOTER()
         hf[i-1]=ccA[i-1][10-1];
 
     }
-    for( i=1; i<= nelA; i++)    
+    for( i=1; i<= nelA; i++)
     {
-        if(codT[i-1] == 1)      
+        if(codT[i-1] == 1)
         {
             flujA[i-1]=x[i-1];
         }
-        if(codT[i-1] == 2)      
+        if(codT[i-1] == 2)
         {
             tempA[i-1]=x[i-1];
         }
-        if(codT[i-1] == 4)      
+        if(codT[i-1] == 4)
         {
             tempA[i-1]=x[i-1];
             flujA[i-1]=-hf[i-1]/lamA*(x[i-1]-tf[i-1]);
         }
-        if((codT[i-1] == 3) || (codT[i-1] == 5))      
+        if((codT[i-1] == 3) || (codT[i-1] == 5))
         {
             tempA[i-1]=x[i-1];
             flujA[i-1]=-lamB/lamA*x[i+nelA-1];
         }
     }
     //* CUERPO B
-    for( i=1; i<=nelB; i++)    
+    for( i=1; i<=nelB; i++)
     {
         codT[i-1]=codB[i-1][2-1];
         tempB[i-1]=ccB[i-1][7-1];
@@ -2047,24 +2064,24 @@ void CONTORNOTER()
         tf[i-1]=ccB[i-1][9-1];
         hf[i-1]=ccB[i-1][10-1];
     }
-    for( i=1; i<=nelB; i++)    
+    for( i=1; i<=nelB; i++)
     {
-        if(codT[i-1] == 1)      
+        if(codT[i-1] == 1)
         {
             flujB[i-1]=x[i+nelA-1];
 
         }
-        if(codT[i-1] == 2)      
+        if(codT[i-1] == 2)
         {
             tempB[i-1]=x[i+nelA-1];
         }
-        if(codT[i-1] == 4)      
+        if(codT[i-1] == 4)
         {
             tempB[i-1]=x[i+nelA-1];
             flujB[i-1]=-hf[i-1]/lamB*(x[i+nelA-1]-tf[i-1]);
         }
         //* Con resistencia termica
-        if((codT[i-1] == 3) || (codT[i-1] == 5))      
+        if((codT[i-1] == 3) || (codT[i-1] == 5))
         {
             tempB[i-1]=x[i-1]-lamB*RTC[i-1]*x[i+nelA-1];
             flujB[i-1]=x[i+nelA-1];
@@ -2098,14 +2115,14 @@ void SALIDATER()
 
     //*  Zona de contacto de A
     //write(out2s,50)
-    for( i=1; i<=nelpc; i++)    
+    for( i=1; i<=nelpc; i++)
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempA[i-1],flujA[i-1]);		// Formato: 100
     }
     //*  Zona libre de A
     fprintf(out2s,"  - Zona libre -\n");	// Formato: 60
     //write(out2s,50)
-    for( i=nelpc+1; i<=nelA; i++)    
+    for( i=nelpc+1; i<=nelA; i++)
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempA[i-1],flujA[i-1]);		// Formato: 100
     }
@@ -2119,14 +2136,14 @@ void SALIDATER()
     //*  Zona de contacto de B
     //write(out2s,50)
 
-    for( i=1; i<=nelpc; i++)        
+    for( i=1; i<=nelpc; i++)
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempB[i-1],flujB[i-1]);		// Formato: 100
     }
     //*  Zona libre de B
     fprintf(out2s,"  - Zona libre -\n");	// Formato: 60
     //write(out2s,50)
-    for( i=nelpc+1; i<=nelB; i++)        
+    for( i=nelpc+1; i<=nelB; i++)
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempB[i-1],flujB[i-1]);		// Formato: 100
     }
@@ -2162,11 +2179,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
     int el=*punteroA_el;int nd=*punteroA_nd;int i;int j;;
 
     //* Codigo 1
-    if(cod == 1)      
+    if(cod == 1)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=1; j<=3; j++)                  
+            for( j=1; j<=3; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=-BE[i-1][j-1]*Emedia;
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][j-1]*cc[j-1];
@@ -2174,11 +2191,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 2
     }
-    else if(cod == 2)      
+    else if(cod == 2)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=1; j<=2; j++)                  
+            for( j=1; j<=2; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=-BE[i-1][j-1]*Emedia;
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][j-1]*cc[j-1];
@@ -2188,9 +2205,9 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 3
     }
-    else if(cod == 3)      
+    else if(cod == 3)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
             a[3*(nel+nd-1)+i-1][3*(nel+el)-2-1]=-BE[i-1][1-1]*Emedia;
             a[3*(nel+nd-1)+i-1][3*(nel+el)-1-1]=AE[i-1][2-1];
@@ -2201,11 +2218,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 4
     }
-    else if(cod == 4)      
+    else if(cod == 4)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=2; j<=3; j++)                  
+            for( j=2; j<=3; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=AE[i-1][j-1];
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][2-1]*cc[3+j-1];
@@ -2215,11 +2232,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 5
     }
-    else if(cod == 5)      
+    else if(cod == 5)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=2; j<=3; j++)                  
+            for( j=2; j<=3; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=-BE[i-1][j-1]*Emedia;
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][3-1]*cc[j-1];
@@ -2229,9 +2246,9 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 6
     }
-    else if(cod == 6)      
+    else if(cod == 6)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
             a[3*(nel+nd-1)+i-1][3*(nel+el)-2-1]=AE[i-1][1-1];
             a[3*(nel+nd-1)+i-1][3*(nel+el)-1-1]=-BE[i-1][2-1]*Emedia;
@@ -2242,11 +2259,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 7
     }
-    else if(cod == 7)      
+    else if(cod == 7)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=1; j<=2; j++)                  
+            for( j=1; j<=2; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=AE[i-1][j-1];
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][j-1]*cc[j+3-1];
@@ -2256,11 +2273,11 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
         }
         //* Codigo 8
     }
-    else if(cod == 8)      
+    else if(cod == 8)
     {
-        for( i=1; i<=3; i++)            
+        for( i=1; i<=3; i++)
         {
-            for( j=1; j<=3; j++)                  
+            for( j=1; j<=3; j++)
             {
                 a[3*(nel+nd-1)+i-1][3*(nel+el-1)+j-1]=AE[i-1][j-1];
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][j-1]*cc[j+3-1];
@@ -2281,120 +2298,120 @@ void INTLIBR(int* punteroA_j,int* punteroA_ix)
     int ix=*punteroA_ix;;	//parametro para identificar la numeración de las variables.
     int j=*punteroA_j;;	//auxiliar
 
-    if(ix == 0)      
+    if(ix == 0)
     {
         //* Cuerpo "A"
         //* Codigo 1
-        if(codA[j-1][1-1] == 1)            
+        if(codA[j-1][1-1] == 1)
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 2
         }
-        else if(codA[j-1][1-1] == 2)            
+        else if(codA[j-1][1-1] == 2)
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 3
         }
-        else if(codA[j-1][1-1] == 3)            
+        else if(codA[j-1][1-1] == 3)
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 4
         }
-        else if(codA[j-1][1-1] == 4)            
+        else if(codA[j-1][1-1] == 4)
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 5
         }
-        else if(codA[j-1][1-1] == 5)            
+        else if(codA[j-1][1-1] == 5)
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 6
         }
-        else if(codA[j-1][1-1] == 6)            
+        else if(codA[j-1][1-1] == 6)
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 7
         }
-        else if(codA[j-1][1-1] == 7)            
+        else if(codA[j-1][1-1] == 7)
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 8
         }
-        else if(codA[j-1][1-1] == 8)            
+        else if(codA[j-1][1-1] == 8)
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][3-1]=x[ix+3*j-1];
         }
     }
-    else      
+    else
     {
         //* Cuerpo "B"
         //* Codigo 1
-        if(codB[j-1][1-1] == 1)            
+        if(codB[j-1][1-1] == 1)
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 2
         }
-        else if(codB[j-1][1-1] == 2)            
+        else if(codB[j-1][1-1] == 2)
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 3
         }
-        else if(codB[j-1][1-1] == 3)            
+        else if(codB[j-1][1-1] == 3)
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 4
         }
-        else if(codB[j-1][1-1] == 4)            
+        else if(codB[j-1][1-1] == 4)
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 5
         }
-        else if(codB[j-1][1-1] == 5)            
+        else if(codB[j-1][1-1] == 5)
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 6
         }
-        else if(codB[j-1][1-1] == 6)            
+        else if(codB[j-1][1-1] == 6)
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][3-1]=x[ix+3*j-1];
             //* Codigo 7
         }
-        else if(codB[j-1][1-1] == 7)            
+        else if(codB[j-1][1-1] == 7)
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
             //* Codigo 8
         }
-        else if(codB[j-1][1-1] == 8)            
+        else if(codB[j-1][1-1] == 8)
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][2-1]=x[ix+3*j-1-1];
@@ -2424,27 +2441,27 @@ void CHETRAC()
     int nd,j;	//auxiliar
 
     //* Chequea tracciones
-    for( nd=1; nd<=nelpc; nd++)      
+    for( nd=1; nd<=nelpc; nd++)
     {
-        if((((tpproT == 1) || (tpproTE == 1)) && (codA[nd-1][2-1] == 3)) || ((tpproE == 1) && (codA[nd-1][1-1] == 9)))         
+        if((((tpproT == 1) || (tpproTE == 1)) && (codA[nd-1][2-1] == 3)) || ((tpproE == 1) && (codA[nd-1][1-1] == 9)))
         {
-            if(ccA[nd-1][4-1] < 0.0 )           
+            if(ccA[nd-1][4-1] < 0.0 )
             {
                 //*                  write(out1s,50)nd,ccA(nd,4),codA(nd,1)
             }
-            else            
+            else
             {
                 ifla=ifla+1;
                 codA[nd-1][1-1]=8;
                 codB[nd-1][1-1]=8;
-                for( j=4; j<=6; j++)                  
+                for( j=4; j<=6; j++)
                 {
                     ccA[nd-1][j-1]=0;
                     ccB[nd-1][j-1]=0;
                 }
                 //defino el tipo de transferencia de calor en los despegues
 
-                if(tip == 0)                  
+                if(tip == 0)
                 {
                     //*sin intercambio de calor en los despegues
 
@@ -2455,7 +2472,7 @@ void CHETRAC()
                     ccB[nd-1][8-1]=0;
 
                 }
-                else if(tip == 1)                   
+                else if(tip == 1)
                 {
                     //* Convección libre
 
@@ -2465,7 +2482,7 @@ void CHETRAC()
                     RTC[nd-1]=2/hflu;
 
                 }
-                else if(tip == 2)                   
+                else if(tip == 2)
                 {
                     //* convección forzada
 
@@ -2478,7 +2495,7 @@ void CHETRAC()
                     ccB[nd-1][10-1]=hflu;
 
                 }
-                else if(tip == 3)                   
+                else if(tip == 3)
                 {
                     //* conducción NO VA BIEN
 
@@ -2511,21 +2528,21 @@ void CHEINTE()
 
     //* Calcula la separacion entre los pares de contacto ( gap )
 
-    for( nd=1; nd<=nelpc; nd++)      
+    for( nd=1; nd<=nelpc; nd++)
     {
         xgap=-(ccA[nd-1][1-1]+ccB[nd-1][1-1]-gap[nd-1]);
         //* Chequea interpenetraciones
-        if(xgap >= 0. )            
+        if(xgap >= 0. )
         {
             //*                  write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
         }
-        else            
+        else
         {
-            if(fabs(xgap) < 1.0E-10 )                  
+            if(fabs(xgap) < 1.0E-10 )
             {
                 //*                        write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
             }
-            else                  
+            else
             {
                 ifla=ifla+1;
                 codA[nd-1][1-1]=9;
@@ -2541,4 +2558,3 @@ void CHEINTE()
 
     return;
 }
-

@@ -514,14 +514,7 @@ void SISTLOCAL()
     }
     return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:                                                                    *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Subrutina maestra de integracion                             *
-//*                                                                            *
-//******************************************************************************
+
 //********************************* NOTA ***************************************
 //*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
 //******************************************************************************
@@ -541,42 +534,49 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
     double  C1[3],C2[3],C3[3],C4[3],C5[3],C6[3],C7[3];
     double  D1[3][3],D2[3][3],D3[3][3],D4[3][3],D5[3][3],D6[3][3],D7[3][3];
 
-    /*double AE_T[3*nelT][3*nelT];*	//*double BE_T[3*nelT][3*nelT];*/;
-    /*double AT_T[nelT][nelT];*	//*double BT_T[nelT][nelT];*/;
-    /*double CTE_T[3*nelT][nelT];*	//*double DTE_T[3*nelT][nelT];*/;
-
     //* Calcula constantes
     cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
     cte2=1.0-2.0*nuT;
     cte3=8.0*(1.0-nuT)*4.0*atan(1.0);
     cte4=4.0*4.0*atan(1.0);
     cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
-    //cte1=16.D0*3.141592654D0*GT*(1.D0-nuT)
-    //cte3=8.D0*(1.D0-nuT)*3.141592654D0
-    //cte4=4.D0*3.141592654D0
-    //cte5=alT*(1.D0+nuT)/(8.D0*3.141592654D0*(1.D0-nuT))
 
-    //* Obtenemos los indices para buscar en los bucles
-    inicioBucle = (nelT / numproc) * miId;
-    if (nelT % numproc > miId)
-    {
-      inicioBucle += miId;
-      finBucle = inicioBucle + (nelT / numproc) + 1;
-    }
-    else
-    {
-      inicioBucle += nelT % numproc;
-      finBucle = inicioBucle + (nelT / numproc);
-    }
+    //------------------------------ 2a SOLUCIÓN -------------------------------------
+    //* Calculamos el inicio y el fin de las posiciones que tiene que tratar cada proceso
+    // inicioBucle = (nelT / numproc) * miId;
+    // if (nelT % numproc > miId)
+    // {
+    //   inicioBucle += miId;
+    //   finBucle = inicioBucle + (nelT / numproc) + 1;
+    // }
+    // else
+    // {
+    //   inicioBucle += nelT % numproc;
+    //   finBucle = inicioBucle + (nelT / numproc);
+    // }
+    // Al inicio le tenemos que sumar 1 porque los indices para los calculos empiezan en 1
+    // inicioBucle+=1;
+    //------------------------------ FIN 2a SOLUCIÓN ----------------------------------
+
+    //------------------------------ 3a SOLUCIÓN -------------------------------------
+    inicioBucle = 1;
+    finBucle = nelT;
+    //------------------------------ FIN 3a SOLUCIÓN ----------------------------------
+
     printf("Numero total elementos: %d\n",nelT);
     printf("Proceso: %d %d ~ %d\n",miId,inicioBucle,finBucle);
 
     //* Caso en que no haya simetria implicita ++++++++++++++++++++++++++++++++++++++++++++++++
     if((simXY != 1) && (simXZ != 1) && (simYZ != 1))
     {
+
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -604,40 +604,37 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 if((tpproE == 1) || (tpproTE == 1))
                 {
                     //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(AE,BE,&el);
+
+                    if(enExcepcion==1)return;
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
                 ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
 
                 if(enExcepcion==1)return;
             }
         }
+
         //* Caso en que haya simetria respecto del plano OXY ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY == 1) && (simXZ != 1) && (simYZ != 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -665,7 +662,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra SIMÉTRICO OXY
 
@@ -693,7 +692,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Combina coeficientes
                 //* Elásticos
@@ -735,7 +736,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     //* Cambia de coordenadas los coeficientes elasticos y termoelásticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(AE,BE,&el);
+
+                    if(enExcepcion==1)return;
                 }
                 //* Térmicos
                 if((tpproT == 1) || (tpproTE == 1))
@@ -745,29 +748,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso de que haya simetria respecto del plano OXZ ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY != 1) && (simXZ == 1) && (simYZ != 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -795,7 +792,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz
 
@@ -823,7 +822,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Elásticos
                 //* Combina coeficientes
@@ -865,7 +866,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(AE,BE,&el);
+
+                    if(enExcepcion==1)return;
                 }
                 //* Térmicos
                 if((tpproT == 1) || (tpproTE == 1))
@@ -875,29 +878,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso de que haya simetria respecto del plano OYZ ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY != 1) && (simXZ != 1) && (simYZ == 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -925,7 +922,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oyz
 
@@ -952,7 +951,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[3-1][i-1]=extraux;
                 }
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Elasticos
                 //* Combina coeficientes
@@ -995,7 +996,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Cambia de coordenadas los coeficientes elasticos
-                TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                TRANSFORMA(AE,BE,&el);
+
+                if(enExcepcion==1)return;
 
                 //* Térmicos
                 if((tpproT == 1) || (tpproTE == 1))
@@ -1005,29 +1008,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso de simetria respecto de los planos OXY y OXZ ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY == 1) && (simXZ == 1) && (simYZ != 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -1055,7 +1052,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy
 
@@ -1083,7 +1082,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy y Oxz
 
@@ -1102,7 +1103,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz
 
@@ -1121,7 +1124,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);
+
+                if(enExcepcion==1)return;
 
                 //* Elasticos
                 //* Combina coeficientes
@@ -1147,8 +1152,12 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]+D3[i-1][3-1];
                     }
                 }
+
                 //* Cambia de coordenadas los coeficientes elasticos
-                TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                TRANSFORMA(AE,BE,&el);
+
+                if(enExcepcion==1)return;
+
                 //* Térmicos
                 if((tpproT == 1) || (tpproTE == 1))
                 {
@@ -1157,29 +1166,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso de simetria respecto de los planos OXY y OYZ ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY == 1) && (simXZ != 1) && (simYZ == 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -1207,7 +1210,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy
 
@@ -1235,7 +1240,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy y Oyz
 
@@ -1254,7 +1261,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oyz
 
@@ -1280,7 +1289,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[2-1][i-1]=extr[3-1][i-1];
                     extr[3-1][i-1]=extraux;
                 }
-                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);
+
+                if(enExcepcion==1)return;
 
                 //* Elasticos
                 //* Combina coeficientes
@@ -1310,7 +1321,10 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
                 }
                 //* Cambia de coordenadas los coeficientes elasticos
-                TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                TRANSFORMA(AE,BE,&el);
+
+                if(enExcepcion==1)return;
+
                 //* Térmicos
                 if((tpproT == 1) || (tpproTE == 1))
                 {
@@ -1319,29 +1333,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
         //* Caso de simetria respecto de los planos OXZ y OYZ ++++++++++++++++++++++++++++++++++++++++
     }
     else if((simXY != 1) && (simXZ == 1) && (simYZ == 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -1369,11 +1377,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'AE',AE(1,1),AE(1,2),AE(1,3),AE(2,1),AE(2,2),AE(2,3),AE(3,1),AE(3,2),AE(3,3)
-                //endif
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
 
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oyz
 
@@ -1401,11 +1407,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum=1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'AE1',AE1(1,1),AE1(1,2),AE1(1,3),AE1(2,1),AE1(2,2),AE1(2,3),AE1(3,1),AE1(3,2),AE1(3,3)
-                //endif
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
 
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz y Oyz
 
@@ -1424,11 +1428,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'AE2',AE2(1,1),AE2(1,2),AE2(1,3),AE2(2,1),AE2(2,2),AE2(2,3),AE2(3,1),AE2(3,2),AE2(3,3)
-                //endif
+                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);
 
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz
 
@@ -1447,6 +1449,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
+
                 //* Intercambia extremos 2 y 3
                 for( i=1; i<=3; i++)
                 {
@@ -1454,11 +1457,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[2-1][i-1]=extr[3-1][i-1];
                     extr[3-1][i-1]=extraux;
                 }
-                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'AE3',AE3(1,1),AE3(1,2),AE3(1,3),AE3(2,1),AE3(2,2),AE3(2,3),AE3(3,1),AE3(3,2),AE3(3,3)
-                //endif
+                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);
 
+                if(enExcepcion==1)return;
 
                 //* Elasticos
                 //* Combina coeficientes
@@ -1487,15 +1488,12 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         DTE[i-1][3-1]=DTE[i-1][3-1]+D1[i-1][3-1]+D2[i-1][3-1]+D3[i-1][3-1];
                     }
                 }
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'combina',AE(1,1),AE(1,2),AE(1,3),AE(2,1),AE(2,2),AE(2,3),AE(3,1),AE(3,2),AE(3,3)
-                //endif
-                //* Cambia de coordenadas los coeficientes elasticos
-                TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
 
-                //if ((nd.eq.1).and.(el.eq.129))then
-                //write(out11,*) 'transforma',AE(1,1),AE(1,2),AE(1,3),AE(2,1),AE(2,2),AE(2,3),AE(3,1),AE(3,2),AE(3,3)
-                //endif
+                //* Cambia de coordenadas los coeficientes elasticos
+                TRANSFORMA(AE,BE,&el);
+
+                if(enExcepcion==1)return;
+
                 //* Termicos
                 if((tpproT == 1) || (tpproTE == 1))
                 {
@@ -1508,30 +1506,23 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 {
                     printf("Elemento:%7d%7d\n",nd,el);
                 }
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
 
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                if(enExcepcion==1)return;
             }
         }
         //* Caso en que haya simetria respecto de los tres planos coordenados ++++++++++++++++++++++++++++++++
     }
     else if((simXY == 1) && (simXZ == 1) && (simYZ == 1))
     {
+        // Pragma de la primera solución propuesta
+        //#pragma ompi for
         //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
         for( el = inicioBucle; el <= finBucle; el++)
         {
+            // Pragma de la primera solución propuesta
+            //#pragma ompi for
             //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
             for( nd = inicioBucle; nd <= finBucle; nd++)
             {
@@ -1559,7 +1550,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                     }
                 }
-                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE,BE,&AT,&BT,CTE,DTE);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy
 
@@ -1587,7 +1580,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Asigna tipo de integral
                 intenum = 1;
-                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE1,BE1,&AT1,&BT1,C1,D1);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy y Oxz
 
@@ -1606,7 +1601,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE2,BE2,&AT2,&BT2,C2,D2);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy,Oxz y Oyz
 
@@ -1625,7 +1622,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[2-1][i-1]=extr[3-1][i-1];
                     extr[3-1][i-1]=extraux;
                 }
-                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE3,BE3,&AT3,&BT3,C3,D3);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz
 
@@ -1651,7 +1650,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[2-1][i-1]=extr[3-1][i-1];
                     extr[3-1][i-1]=extraux;
                 }
-                INTEGRA(&intenum,AE4,BE4,&AT4,&BT4,C4,D4);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE4,BE4,&AT4,&BT4,C4,D4);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxz y Oyz
 
@@ -1670,7 +1671,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE5,BE5,&AT5,&BT5,C5,D5);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE5,BE5,&AT5,&BT5,C5,D5);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oyz
 
@@ -1696,7 +1699,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     extr[2-1][i-1]=extr[3-1][i-1];
                     extr[3-1][i-1]=extraux;
                 }
-                INTEGRA(&intenum,AE6,BE6,&AT6,&BT6,C6,D6);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE6,BE6,&AT6,&BT6,C6,D6);
+
+                if(enExcepcion==1)return;
 
                 //* Integra simetrico Oxy y Oyz
 
@@ -1715,7 +1720,9 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                 }
-                INTEGRA(&intenum,AE7,BE7,&AT7,&BT7,C7,D7);if(enExcepcion==1)return;
+                INTEGRA(&intenum,AE7,BE7,&AT7,&BT7,C7,D7);
+
+                if(enExcepcion==1)return;
 
                 //* Elasticos
                 //* Combina coeficientes
@@ -1754,28 +1761,21 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                 }
                 //* Almacena coeficientes
                 reg=(el-1)*nelT+nd;
-                //if((tpproE.eq.1).or.(tpproTE.eq.1))then
-                //write(out11,*)'Elemento:',nd,el
-                //write(out12,*)'Elemento:',nd,el
-                //endif
-                //if((tpproT.eq.1).or.(tpproTE.eq.1))then
-                //write(out13,*)'Elemento:',nd,el
-                //write(out14,*)'Elemento:',nd,el
-                //endif
-                //if(tpproTE.eq.1)then
-                //write(out15,*)'Elemento:',nd,el
-                //write(out16,*)'Elemento:',nd,el
-                //endif
 
-                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+                ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);
+
+                if(enExcepcion==1)return;
             }
         }
     }
     else
     {
         //* No hay mas casos de simetria
-        printf(" **** ERROR **** => Simetrias erroneas\n"); enExcepcion=1;return;
+        printf(" **** ERROR **** => Simetrias erroneas\n");
+        enExcepcion=1;
+        return;
     }
+
     return;
 }
 //******************************************************************************

@@ -78,16 +78,21 @@ void CALCNODOS();
 //******************************************************************************
 
 void SISTLOCAL();
+
 //******************************************************************************
 //*                                                                            *
-//*  Input:                                                                    *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
+//*  Input: No tiene parametros de entrada, ya que utiliza variables globales  *
+//*         para realizar los calculos                                         *
+//*  Output: Matrices del cuerpo para cada tipo de coeficientes                *
+//*           AE_T Coeficientes A elasticos                                    *
+//*           BE_T Coeficientes B elasticos                                    *
+//*           AT_T Coeficiente A termico                                       *
+//*           BT_T Coeficiente B termico                                       *
+//*           CTE_T Coeficientes C termoelasticos                              *
+//*           DTE_T Coeficientes D termoelasticos                              *                  *
+//*  Usage: Metodo que calcula los coeficientes de un cuerpo.                  *                                                *
 //*  Description: Subrutina maestra de integracion                             *
 //*                                                                            *
-//******************************************************************************
-//********************************* NOTA ***************************************
-//*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
 //******************************************************************************
 
 void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
@@ -149,4 +154,3 @@ void CHETRAC();
 
 void CHEINTE();
 #endif /* FUNCIONESA_H_ */
-

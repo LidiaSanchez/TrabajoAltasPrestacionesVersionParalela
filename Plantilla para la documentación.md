@@ -14,7 +14,6 @@
 LIBRERÍA PROBADA | MÉTODO UTILIZADO | TIEMPO DE EJECUCIÓN
 ---------------- | ---------------- | -------------------
 Versión inicial | Sin modificaciones | 581 segundos
----------------- | ---------------- | -------------------
 OpenMP | parallel for | 379 segundos
 
 

@@ -49,114 +49,106 @@ Roberto de Castro Rodríguez (@roberdcr)
 LIBRERÍA PROBADA | MÉTODO UTILIZADO | Nº PROCESOS | TIEMPO COEFICIENTES | TIEMPO ECUACIONES | TIEMPO TOTAL
 ---------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 Versión Inicial  | Sin modificaciones | 1         | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Pragmas         | 1           | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Pragmas         | 10          | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Pragmas         | 50          | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  MPI_Bcast & MPI_Gather | 1    | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  MPI_Bcast & MPI_Gather | 10   |      --             |        --         |     --
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  MPI_Bcast & MPI_Gather | 50   |      --             |        --         |     --
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Coeficientes Paralelos | 1    | 26 segundos         | 545 segundos      | 571 segundos
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Coeficientes Paralelos | 2    | 13 segundos         |        --         |     --
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 MPI              |  Coeficientes Paralelos | 10   | 13 segundos         |        --         |     --
----------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
+
+*Nota*: Las celdas con "--" significa que ha dado error durante la ejecución.
 
 * Problemas encontrados (indicar para cada problema, las soluciones propuestas y la solución aplicada finalmente).
 
-El objetivo es paralelizar el cálculo de los coeficientes para cada cuerpo.
-Los coeficientes de un cuerpo se almacenan en 6 matrices que almacenan valores de tipo double. Estas matrices son:
+  El objetivo es paralelizar el cálculo de los coeficientes para cada cuerpo.
+  Los coeficientes de un cuerpo se almacenan en 6 matrices que almacenan valores de tipo double. Estas matrices son:
 
-  - AE: almacena los coeficientes elásticos del cuerpo
-  - BE: almacena los coeficientes elásticos del cuerpo
-  - AT: almacena los coeficientes térmicos del cuerpo
-  - BT: almacena los coeficientes térmicos del cuerpo
-  - CTE: almacena los coeficientes termoelásticos del cuerpo
-  - DTE: almacena los coeficientes termoelásticos del cuerpo
+    - AE: almacena los coeficientes elásticos del cuerpo
+    - BE: almacena los coeficientes elásticos del cuerpo
+    - AT: almacena los coeficientes térmicos del cuerpo
+    - BT: almacena los coeficientes térmicos del cuerpo
+    - CTE: almacena los coeficientes termoelásticos del cuerpo
+    - DTE: almacena los coeficientes termoelásticos del cuerpo
 
-Estos coeficientes se calculan por medio de la función **COEFICIENTES**, que se encuentra implementada en el archivo funcionesA.c
-El código iterativo tarda unos 13 segundos en obtener los coeficientes para un cuerpo, tras la paralelización buscamos disminuir drásticamente este tiempo repartiendo las matrices anteriormente descritas entre todos los procesos de los que disponemos.
+  Estos coeficientes se calculan por medio de la función **COEFICIENTES**, que se encuentra implementada en el archivo funcionesA.c
+  El código iterativo tarda unos 13 segundos en obtener los coeficientes para un cuerpo, tras la paralelización buscamos disminuir drásticamente este tiempo repartiendo las matrices anteriormente descritas entre todos los procesos de los que disponemos.
 
-Inicialmente se han encontrado dos posibles soluciones a este problema:
+  Inicialmente se han encontrado dos posibles soluciones a este problema:
 
 ######1ª Solución propuesta *Pragmas*:
 
-A partir de la información obtenida en la URL de "Pragmas de OpenMPI", me he encontrado con que ésta libreria utilizada para compilar el código con la API de MPI nos provee de una seria de pragmas que facilitan la paralelización de nuestro código de forma sencilla. Estos pragmas son tratados por el compilador mpicc de forma que automáticamente se paraleliza el código tratado con el pragma.
+  A partir de la información obtenida en la URL de "Pragmas de OpenMPI", me he encontrado con que ésta libreria utilizada para compilar el código con la API de MPI nos provee de una seria de pragmas que facilitan la paralelización de nuestro código de forma sencilla. Estos pragmas son tratados por el compilador mpicc de forma que automáticamente se paraleliza el código tratado con el pragma.
 
-En nuestro caso, como el objetivo es paralelizar los bucles for que recorren las posiciones de las matrices que tenemos que rellenar con los coeficientes calculados, tenemos que utilizar el pragma *#pramga ompi for*. Este pragma actua sobre el siguiente bucle for que se encuentre el compilador paralelizándolo. Para esta solución aplicamos este pragma a todos los bucles *for* que se recorren en el metodo **COEFICIENTES**.
+  En nuestro caso, como el objetivo es paralelizar los bucles for que recorren las posiciones de las matrices que tenemos que rellenar con los coeficientes calculados, tenemos que utilizar el pragma *#pramga ompi for*. Este pragma actua sobre el siguiente bucle for que se encuentre el compilador paralelizándolo. Para esta solución aplicamos este pragma a todos los bucles *for* que se recorren en el metodo **COEFICIENTES**.
 
-Después de comprobar el resultado de los tiempos en la versión sin paralelizar y la versión con los pragmas, se ha observado que el tiempo es el mismo, por lo que se ha llegado a la conclusión de que el compilador de mpi que nos provee Caléndula no funciona, es decir, el pragma definido no es tratado por el compilador de mpicc y los bucles for no han sido paralelizados.
+  Después de comprobar el resultado de los tiempos en la versión sin paralelizar y la versión con los pragmas, se ha observado que el tiempo es el mismo, por lo que se ha llegado a la conclusión de que el compilador de mpi que nos provee Caléndula no funciona, es decir, el pragma definido no es tratado por el compilador de mpicc y los bucles for no han sido paralelizados.
 
 ######2ª Solución propuesta *MPI_Bcast & MPI_Gather*:
 
-Tras el fracaso de la primera solución se ha seguido con el uso de las llamadas que nos provee MPI:
+  Tras el fracaso de la primera solución se ha seguido con el uso de las llamadas que nos provee MPI:
 
-  - MPI_Barrier
-  - MPI_Bcast
-  - MPI_Gather
+    - MPI_Barrier
+    - MPI_Bcast
+    - MPI_Gather
 
-Se ha pretendido paralelizar la llamada a la función coeficientes, el resto del códgio lo ejecuta el proceso maestro.
+  Se ha pretendido paralelizar la llamada a la función coeficientes, el resto del códgio lo ejecuta el proceso maestro.
 
-El algoritmo seguido es:
+  El algoritmo seguido es:
 
-  1. Sincronizar procesos antes de la llamada a **COEFICIENTES**.
+    1. Sincronizar procesos antes de la llamada a **COEFICIENTES**.
 
-      Para asegurarnos de que los datos eran consistentes antes de hacer la llamada a la funcion **COEFICIENTES** para cada cuerpo (A y B) se han sincronizado los procesos por medio de MPI_Barrier para asegurarnos de que antes de realizar la llamada todos los procesos estaban esperando en el mismo punto.
+        Para asegurarnos de que los datos eran consistentes antes de hacer la llamada a la funcion **COEFICIENTES** para cada cuerpo (A y B) se han sincronizado los procesos por medio de MPI_Barrier para asegurarnos de que antes de realizar la llamada todos los procesos estaban esperando en el mismo punto.
 
-  2. Enviar todos los datos necesarios al resto de procesos.
+    2. Enviar todos los datos necesarios al resto de procesos.
 
-      A continuación por medio de MPI_Bcast mandamos desde el maestro al resto de procesos todos los datos necesarios para que cada proceso pueda realizar los cálculos debidos.
+        A continuación por medio de MPI_Bcast mandamos desde el maestro al resto de procesos todos los datos necesarios para que cada proceso pueda realizar los cálculos debidos.
 
-  3. Llamamos a la función **COEFICIENTES**.
+    3. Llamamos a la función **COEFICIENTES**.
 
-      En esta función calculamos los indices de inicio y fin para los bucles for solo recorran un numero determinado de posiciones repartidas equitativamente entre todos los procesos.
+        En esta función calculamos los indices de inicio y fin para los bucles for solo recorran un numero determinado de posiciones repartidas equitativamente entre todos los procesos.
 
-  4. Sincronizar todos los procesos una vez terminada la llamada a la función **COEFICIENTES**.
+    4. Sincronizar todos los procesos una vez terminada la llamada a la función **COEFICIENTES**.
 
-      Después de la llamada a la funcion **COEFICIENTES**, volvemos a realizar la sincronización por medio de MPI_Barrier.
+        Después de la llamada a la funcion **COEFICIENTES**, volvemos a realizar la sincronización por medio de MPI_Barrier.
 
-  5. Agrupar todos los coeficientes obtenidos en las matrices del proceso maestro.
+    5. Agrupar todos los coeficientes obtenidos en las matrices del proceso maestro.
 
-      Para terminar, por medio de MPI_Gather enviamos al proceso maestro los coeficientes calculados por cada proceso esclavo.
+        Para terminar, por medio de MPI_Gather enviamos al proceso maestro los coeficientes calculados por cada proceso esclavo.
 
-Este algoritmo se utiliza para la obtención de los coeficientes de cada cuerpo.
+  Este algoritmo se utiliza para la obtención de los coeficientes de cada cuerpo.
 
-Con el algoritmo planteado solo he conseguido que me funcionase con un único hilo, en el momento que lo ejecutaba con más de dos había alguna variable que llamaba a un puntero nulo haciendo que el programa parase con un error tipo Segmentation Fault.
+  Con el algoritmo planteado solo he conseguido que me funcionase con un único hilo, en el momento que lo ejecutaba con más de dos había alguna variable que llamaba a un puntero nulo haciendo que el programa parase con un error tipo Segmentation Fault.
 
-Esta solución sería la ideal ya que hace uso de todos los recursos proporcionados por el sistema para realizar el cálculo de coeficientes, pero no he sido capaz de implementar correctamente el algoritmo anteriormente definido por medio del API que nos provee MPI.
+  Esta solución sería la ideal ya que hace uso de todos los recursos proporcionados por el sistema para realizar el cálculo de coeficientes, pero no he sido capaz de implementar correctamente el algoritmo anteriormente definido por medio del API que nos provee MPI.
 
 ######3ª Solución propuesta *Coeficientes Paralelos*:
 
-Debido a los problemas al intenar implementar el algortimo para la segunda solución, se ha optado por probar una solución más sencilla que tambien paraleliza la obtención de los coeficientes pero de forma limitada haciendo uso únicamente de dos hilos como máximo.
+  Debido a los problemas al intenar implementar el algortimo para la segunda solución, se ha optado por probar una solución más sencilla que tambien paraleliza la obtención de los coeficientes pero de forma limitada haciendo uso únicamente de dos hilos como máximo.
 
-Para esta solución planteada ser propone realizar el cálculo de los coeficientes para ambos cuerpos a la vez. No sería la solución más eficaz en cuanto a la optimización de recursos, puesto que únicamente utilizaremos dos procesos, uno para cada cuerpo.
+  Para esta solución planteada ser propone realizar el cálculo de los coeficientes para ambos cuerpos a la vez. No sería la solución más eficaz en cuanto a la optimización de recursos, puesto que únicamente utilizaremos dos procesos, uno para cada cuerpo.
 
-El algoritmo sería el siguiente:
+  El algoritmo sería el siguiente:
 
-  1. El proceso maestro calcula los coeficientes para el cuerpo A.
+    1. El proceso maestro calcula los coeficientes para el cuerpo A.
 
-  2. El proceso esclavo calcula los coeficientes para el cuerpo B.
+    2. El proceso esclavo calcula los coeficientes para el cuerpo B.
 
-  3. Sincronizamos los procesos antes de realizar el cálculo de ecuaciones.
+    3. Sincronizamos los procesos antes de realizar el cálculo de ecuaciones.
 
-  4. El proceso esclavo envía las matrices con los coeficientes del cuerpo B al proceso maestro para que este calcule las ecuaciones.
+    4. El proceso esclavo envía las matrices con los coeficientes del cuerpo B al proceso maestro para que este calcule las ecuaciones.
 
-Con esta solución unicamente conseguiriamos reducir como máximo el tiempo del cálculo de los coeficientes a la mitad. En lugar de 26 segundos en total a 13.
+  Con esta solución unicamente conseguiriamos reducir como máximo el tiempo del cálculo de los coeficientes a la mitad. En lugar de 26 segundos en total a 13.
 
 
 * Bibliografía utilizada:
 
-- [Pragmas de OpenMPI](http://www.compunity.org/events/pastevents/ewomp2004/boku_sato_matsubarea_takahashi-13.pdf)
-- [Documentación OpenMpi v.1.6 (versión en Caléndula)](http://www.open-mpi.org/doc/v1.6/)
-- [Paralelizar bucles for en MPI](http://wiki.ccs.tulane.edu/index.php5/Parallel_Loop_MPI)
-- [Ayuda MPI](http://lsi.ugr.es/jmantas/pdp/ayuda/mpi_ayuda.php)
+  - [Pragmas de OpenMPI](http://www.compunity.org/events/pastevents/ewomp2004/boku_sato_matsubarea_takahashi-13.pdf)
+  - [Documentación OpenMpi v.1.6 (versión en Caléndula)](http://www.open-mpi.org/doc/v1.6/)
+  - [Paralelizar bucles for en MPI](http://wiki.ccs.tulane.edu/index.php5/Parallel_Loop_MPI)
+  - [Ayuda MPI](http://lsi.ugr.es/jmantas/pdp/ayuda/mpi_ayuda.php)
 
 
 * Otros puntos que se quieran indicar para incluir en la documentación o en la presentación:

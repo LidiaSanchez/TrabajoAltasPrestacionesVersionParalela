@@ -299,7 +299,7 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
     double  Area;	//Area del elemento
     int  i,j;	//Auxiliares
     double  lado[3];	//longitud de cada lado del elemento
-    double  lad[3][3];	//vector de cada lado del elemento
+    //double  lad[3][3];	//vector de cada lado del elemento
     /*double n[3];*/;	//vector normal al elemento
     double  XP,YP,ZP,XNUE,YNUE,ZNUE;
     double  R,C,C1,C2,C4,C5;
@@ -314,13 +314,13 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
         }
         lado[i-1]=sqrt(lado[i-1]);
     }
-    for( i=1; i<=3; i++)      
+    /*for( i=1; i<=3; i++)
     {
         for( j=1; j<=3; j++)        
         {
             lad[i-1][j-1]= (varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1])/lado[i-1];
         }
-    }
+    }*/
     //* Calcula el area del elemento (3 lados)
     s=(lado[1-1]+lado[2-1]+lado[3-1])/2.0;
     Area=sqrt(s*(s-lado[1-1])*(s-lado[2-1])*(s-lado[3-1]));

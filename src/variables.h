@@ -4,10 +4,22 @@
 #ifndef VARIABLES_H_
 #define VARIABLES_H_
 
-#define  MAX_EX 5000// Máximo número de extremos ( son 4000 todos)
-#define  MAX_ND 5000// Máximo número de nodos
-#define MAX_EL 5000// Máximo número de elementos
-#define MAX_SUB 5000// Máximo número de subelementos
+// CUDA API error checking macro
+#define cudaCheck(error) \
+  if (error != cudaSuccess) { \
+    printf("Fatal error: %s at %s:%d\n", \
+      cudaGetErrorString(error), \
+      __FILE__, __LINE__); \
+    exit(1); \
+  }
+
+#define MAX_EX 5000     // Máximo número de extremos (son 4000 todos)
+#define MAX_ND 5000     // Máximo número de nodos
+#define MAX_EL 5000     // Máximo número de elementos
+#define MAX_SUB 5000    // Máximo número de subelementos
+
+#define BLOCKS_PER_PROCESS 2
+#define THREADS_PER_BLOCK 4
 
 #define FICHERO_ENTRADA_COMPLETA "datos/EntradaCompleta.dat"
 #define FICHERO_TERM "datos/term.dat"
@@ -36,6 +48,30 @@ typedef struct VarPack
     int tipoSimetria;
     double extr[4][3];
 } VarPack;
+
+typedef struct EntradaCuerpo
+{
+    int nexT;
+    int nelT;
+    double ET;
+    double alT;
+    double nuT;
+    double GT;
+    double exT[5000][3];
+    int conT[5000][3];
+    double ndT[5000][3];
+    double locT[5000][9];
+
+    // Coeficientes
+    double * AE;
+    double * BE;
+    double * AT;
+    double * BT;
+    double * CTE;
+    double * DTE;
+
+    VarPack varPack;
+} EntradaCuerpo;
 
 extern int enExcepcion;
 
@@ -147,12 +183,12 @@ extern double  DTTE[3];// Coeficientes D termoelasticos
 extern double  DTE[3][3];// Coeficientes D termoelasticos
 
 
-extern double** AE_A;double** AE_B;
-extern double** BE_A;double** BE_B;
-extern double** AT_A;double** AT_B;
-extern double** BT_A;double** BT_B;
-extern double** CTE_A;double** CTE_B;
-extern double** DTE_A;double** DTE_B;
+extern double** AE_A;extern double** AE_B;
+extern double** BE_A;extern double** BE_B;
+extern double** AT_A;extern double** AT_B;
+extern double** BT_A;extern double** BT_B;
+extern double** CTE_A;extern double** CTE_B;
+extern double** DTE_A;extern double** DTE_B;
 
 
 extern double  a[3*MAX_EL][3*MAX_EL];// Matriz del sistema de ecuaciones

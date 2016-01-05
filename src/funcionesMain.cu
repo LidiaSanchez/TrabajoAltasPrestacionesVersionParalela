@@ -322,29 +322,29 @@ void INTEGRAL()
     printf("++++++++ Calcula coeficientes del cuerpo \"A\" ++++++++\n");
     tiniA = clock()/CLOCKS_PER_SEC;
     printf("Inicio calculo coeficientes.%f\n",tiniA);
-    AE_A = malloc((3*nelT)*sizeof(double*));int iTemp;for(iTemp=0;iTemp<3*nelT;iTemp++)
+    AE_A = (double**)malloc((3*nelT)*sizeof(double*));int iTemp;for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        AE_A[iTemp] = malloc((3*nelT)*sizeof(double));
+        AE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
     }
-    BE_A = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    BE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        BE_A[iTemp] = malloc((3*nelT)*sizeof(double));
+        BE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
     }
-    AT_A = malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    AT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
     {
-        AT_A[iTemp] = malloc((nelT)*sizeof(double));
+        AT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    BT_A = malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    BT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
     {
-        BT_A[iTemp] = malloc((nelT)*sizeof(double));
+        BT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    CTE_A = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    CTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        CTE_A[iTemp] = malloc((nelT)*sizeof(double));
+        CTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    DTE_A = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    DTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        DTE_A[iTemp] = malloc((nelT)*sizeof(double));
+        DTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
     COEFICIENTES(AE_A,BE_A,AT_A,BT_A,CTE_A,DTE_A);if(enExcepcion==1)return;
     
@@ -386,29 +386,29 @@ void INTEGRAL()
     printf("+++++++ Calcula coeficientes del cuerpo \"B\" +++++++\n");
     tiniB = clock()/CLOCKS_PER_SEC;
     printf("Inicio calculo coeficientes.%f\n",tiniB);
-    AE_B = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    AE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        AE_B[iTemp] = malloc((3*nelT)*sizeof(double));
+        AE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
     }
-    BE_B = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    BE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        BE_B[iTemp] = malloc((3*nelT)*sizeof(double));
+        BE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
     }
-    AT_B = malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    AT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
     {
-        AT_B[iTemp] = malloc((nelT)*sizeof(double));
+        AT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    BT_B = malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    BT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
     {
-        BT_B[iTemp] = malloc((nelT)*sizeof(double));
+        BT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    CTE_B = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    CTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        CTE_B[iTemp] = malloc((nelT)*sizeof(double));
+        CTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
-    DTE_B = malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    DTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        DTE_B[iTemp] = malloc((nelT)*sizeof(double));
+        DTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
     }
     COEFICIENTES(AE_B,BE_B,AT_B,BT_B,CTE_B,DTE_B);if(enExcepcion==1)return;
     

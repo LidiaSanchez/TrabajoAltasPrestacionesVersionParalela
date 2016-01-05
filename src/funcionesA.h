@@ -148,5 +148,8 @@ void CHETRAC();
 //************************************************************************
 
 void CHEINTE();
+
+
+int ObtenerSimetria();
 #endif /* FUNCIONESA_H_ */
 

@@ -1,22 +1,22 @@
 #include "funcionesA.h"
 
-//******************************************************************************
-//*                                                                            *
-//*  Input:       Fichero 'Entrada.dat'                                        *
-//*               elInicial = Numero de elemento inicial                       *
-//*               exInicial = Numero de extremo inicial                        *
-//*               bContacto = 1 si es superficie de contacto                   *
-//*  Output:      elInicial = Numero de elemento final                         *
-//*               exInicial = Numero de extremo final                          *
-//*  Usage:                                                                    *
-//*  Description: Superficie de contacto codificada de 4 extremos              *
-//*                                                                            *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:       Fichero 'Entrada.dat'                                        *
+//               elInicial = Numero de elemento inicial                       *
+//               exInicial = Numero de extremo inicial                        *
+//               bContacto = 1 si es superficie de contacto                   *
+//  Output:      elInicial = Numero de elemento final                         *
+//               exInicial = Numero de extremo final                          *
+//  Usage:                                                                    *
+//  Description: Superficie de contacto codificada de 4 extremos              *
+//                                                                            *
+//                                                                            *
+//*****************************************************************************
 
 void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punteroA_bContacto)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int elInicial=*punteroA_elInicial,exInicial=*punteroA_exInicial;	//Elemento y extremo inicial
@@ -25,19 +25,19 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     double  rAB,rAD;	//Razon de la progresion en ambos sentidos
     int  exAB,exAD;	//Numero de extremos menos uno en las direcciones AB y AD
     int  tpEl,fMallado;	//Flag de tipo de elemento y de mallado
-    int  elPri, exPri;	//Auxiliares
+    int  /*elPri,*/ exPri;	//Auxiliares
     int  nexAB,nexAD,nelAB,nelAD;
     int  i;
     double  eta1,eta2,modulo;
-    //* Inicializa variables
+    // Inicializa variables
     exPri=exInicial;
-    elPri=elInicial;
+    //elPri=elInicial;
     
 #ifdef DEBUG
     printf("[funcionesA.c] in1 handler: %p\n", &in1);
 #endif    
     
-    //* Lee valores de la codificacion
+    // Lee valores de la codificacion
     leeEntero(in1,&exAB);leeEntero(in1,&exAD);leeDouble(in1,&rAB);leeDouble(in1,&rAD);leeLinea(in1);
     leeEntero(in1,&tpEl);leeEntero(in1,&fMallado);leeLinea(in1);	//OJO: No se utilizan
     leeDouble(in1,&ptA[1-1]);leeDouble(in1,&ptA[2-1]);leeDouble(in1,&ptA[3-1]);leeLinea(in1);
@@ -57,7 +57,7 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     leeDouble(in1,&ptB[1-1]);leeDouble(in1,&ptB[2-1]);leeDouble(in1,&ptB[3-1]);leeLinea(in1);
     leeDouble(in1,&ptC[1-1]);leeDouble(in1,&ptC[2-1]);leeDouble(in1,&ptC[3-1]);leeLinea(in1);
     leeDouble(in1,&ptD[1-1]);leeDouble(in1,&ptD[2-1]);leeDouble(in1,&ptD[3-1]);leeLinea(in1);
-    //* Calcula los extremos de los elementos
+    // Calcula los extremos de los elementos
     for( nexAD=0; nexAD<=exAD; nexAD++)      
     {
         if((nexAD == 0) || (rAD == 1.0) )        
@@ -93,7 +93,7 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
             exInicial=exInicial+1;
         }
     }
-    //* Genera la tabla de conectividades y segundo eje del sistema local
+    // Genera la tabla de conectividades y segundo eje del sistema local
     for( nelAD=1; nelAD<=exAD; nelAD++)      
     {
         for( nelAB=1; nelAB<=exAB; nelAB++)        
@@ -176,18 +176,18 @@ void SUPERFICIE_CUATRO(int* punteroA_elInicial,int* punteroA_exInicial,int* punt
     }
     *punteroA_elInicial = elInicial; *punteroA_exInicial = exInicial; *punteroA_bContacto = bContacto; return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:       Fichero 'Entrada.dat'                                        *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Superficie de contacto codificada de 3 extremos              *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:       Fichero 'Entrada.dat'                                        *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Superficie de contacto codificada de 3 extremos              *
+//                                                                            *
+//*****************************************************************************
 
 void SUPERFICIE_TRES(int* punteroA_elInicial,int* punteroA_exInicial,int* punteroA_bContacto)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int elInicial=*punteroA_elInicial,exInicial=*punteroA_exInicial;	//Elemento y extremo inicial
@@ -199,36 +199,36 @@ void SUPERFICIE_TRES(int* punteroA_elInicial,int* punteroA_exInicial,int* punter
     bContacto=0;
 
 
-    //*       INCOMPLETA
+    //       INCOMPLETA
 
 
     *punteroA_elInicial = elInicial; *punteroA_exInicial = exInicial; *punteroA_bContacto = bContacto; return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:       Fichero 'Entrada.dat'                                        *
-//*               ndInicial = Nodo en el que se comienza la asignacion         *
-//*               ndFinal = Nodo en el que se finaliza la asignacion           *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Lee los codigos de carga                                     *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:       Fichero 'Entrada.dat'                                        *
+//               ndInicial = Nodo en el que se comienza la asignacion         *
+//               ndFinal = Nodo en el que se finaliza la asignacion           *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Lee los codigos de carga                                     *
+//                                                                            *
+//*****************************************************************************
 
 void LEE_CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int ndInicial=*punteroA_ndInicial,ndFinal=*punteroA_ndFinal;	//Nodos inicial y final
     int  tpCod;	//Auxiliares
-    //* Codigos elasticos
+    // Codigos elasticos
     if((tpproE == 1) || (tpproTE == 1))      
     {
         tpCod=1;
         CODIGOS(&ndInicial,& ndFinal,&tpCod);if(enExcepcion==1)return;
     }
-    //* Codigos termicos
+    // Codigos termicos
     if((tpproT == 1) || (tpproTE == 1))      
     {
         tpCod=2;
@@ -236,26 +236,26 @@ void LEE_CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal)
     }
     *punteroA_ndInicial = ndInicial; *punteroA_ndFinal = ndFinal; return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:       Fichero 'Entrada.dat'                                        *
-//*               ndInicial = Nodo en el que se comienza la asignacion         *
-//*               ndFinal = Nodo en el que se finaliza la asignacion           *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Lee los condiciones de contorno                              *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:       Fichero 'Entrada.dat'                                        *
+//               ndInicial = Nodo en el que se comienza la asignacion         *
+//               ndFinal = Nodo en el que se finaliza la asignacion           *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Lee los condiciones de contorno                              *
+//                                                                            *
+//*****************************************************************************
 
 void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int ndInicial=*punteroA_ndInicial,ndFinal=*punteroA_ndFinal;	//Nodos inicial y final
     int  ndUlt,ndAct,nd,i;	//Auxiliares
     double  dat1, dat2,dat3;
-    //* Condiciones de contorno elasticas
+    // Condiciones de contorno elasticas
     if((tpproE == 1) || (tpproTE == 1))      
     {
         ndAct = ndInicial;
@@ -269,64 +269,64 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
             }
             for( nd=ndAct; nd<=ndUlt; nd++)          
             {
-                //* Inicializa valores de las condiciones de contorno
+                // Inicializa valores de las condiciones de contorno
                 for( i=1; i<=10; i++)            
                 {
                     ccB[nd-1][i-1]=0.0;
                 }
-                //* Asigna las condiciones de contorno
+                // Asigna las condiciones de contorno
                 if(codB[nd-1][1-1] == 1)            
                 {
-                    //* Codigo 1
+                    // Codigo 1
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 2)            
                 {
-                    //* Codigo 2
+                    // Codigo 2
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 3)            
                 {
-                    //* Codigo 3
+                    // Codigo 3
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 4)            
                 {
-                    //* Codigo 4
+                    // Codigo 4
                     ccB[nd-1][1-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 5)            
                 {
-                    //* Codigo 5
+                    // Codigo 5
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 6)            
                 {
-                    //* Codigo 6
+                    // Codigo 6
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][2-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 7)            
                 {
-                    //* Codigo 7
+                    // Codigo 7
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][3-1]=dat3;
                 }
                 else if(codB[nd-1][1-1] == 8)            
                 {
-                    //* Codigo 8
+                    // Codigo 8
                     ccB[nd-1][4-1]=dat1;
                     ccB[nd-1][5-1]=dat2;
                     ccB[nd-1][6-1]=dat3;
@@ -340,7 +340,7 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
             ndAct=ndUlt+1;
         }
     }
-    //* Condiciones de contorno termicas
+    // Condiciones de contorno termicas
     if((tpproT == 1) || (tpproTE == 1))      
     {
         ndAct = ndInicial;
@@ -354,20 +354,20 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
             }
             for( nd=ndAct; nd<=ndUlt; nd++)          
             {
-                //* Asigna las condiciones de contorno
+                // Asigna las condiciones de contorno
                 if(codB[nd-1][2-1] == 1)            
                 {
-                    //* Codigo 1
+                    // Codigo 1
                     ccB[nd-1][7-1]=dat1;
                 }
                 else if(codB[nd-1][2-1] == 2)            
                 {
-                    //* Codigo 2
+                    // Codigo 2
                     ccB[nd-1][8-1]=dat1;
                 }
                 else if(codB[nd-1][2-1] == 4)            
                 {
-                    //* Codigo 4
+                    // Codigo 4
                     ccB[nd-1][9-1]=dat1;
                     ccB[nd-1][10-1]=dat2;
                 }
@@ -382,22 +382,22 @@ void LEE_CC(int* punteroA_ndInicial,int* punteroA_ndFinal)
     }
     *punteroA_ndInicial = ndInicial; *punteroA_ndFinal = ndFinal; return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:                                                                    *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Calcula los nodos en ambos sólidos                           *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:                                                                    *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Calcula los nodos en ambos sólidos                           *
+//                                                                            *
+//*****************************************************************************
 
 void CALCNODOS()
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int  i,j,k;	//Auxiliares
-    //* Calcula los nodos de "A"
+    // Calcula los nodos de "A"
     for( i=1; i<=nelA; i++)      
     {
         for( j=1; j<=3; j++)        
@@ -409,7 +409,7 @@ void CALCNODOS()
             }
         }
     }
-    //* Calcula los nodos de "B"
+    // Calcula los nodos de "B"
     for( i=1; i<=nelB; i++)      
     {
         for( j=1; j<=3; j++)        
@@ -423,23 +423,23 @@ void CALCNODOS()
     }
     return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:                                                                    *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Calcula el sistema local en ambos sólidos                    *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:                                                                    *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Calcula el sistema local en ambos sólidos                    *
+//                                                                            *
+//*****************************************************************************
 
 void SISTLOCAL()
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int  i,j;	//Auxiliares
     double  xx[3],yy[3],zz[3],modulo;
-    //* Calcula el vector normal de "A" ( Eje 1 )
+    // Calcula el vector normal de "A" ( Eje 1 )
     for( i=1; i<=nelA; i++)      
     {
         for( j=1; j<=3; j++)        
@@ -473,14 +473,14 @@ void SISTLOCAL()
             printf("*** ERROR*** => MODULO NULO EN SISTEMA LOCAL. SOLIDO A\n"); enExcepcion=1;return;
         }
     }
-    //* Calcula la tercera direccion local de "A"
+    // Calcula la tercera direccion local de "A"
     for( i=1; i<=nelA; i++)      
     {
         locA[i-1][7-1]=locA[i-1][2-1]*locA[i-1][6-1]-locA[i-1][3-1]*locA[i-1][5-1];
         locA[i-1][8-1]=locA[i-1][3-1]*locA[i-1][4-1]-locA[i-1][1-1]*locA[i-1][6-1];
         locA[i-1][9-1]=locA[i-1][1-1]*locA[i-1][5-1]-locA[i-1][2-1]*locA[i-1][4-1];
     }
-    //* Calcula el vector normal de "B" ( Eje 1 )
+    // Calcula el vector normal de "B" ( Eje 1 )
     for( i=1; i<=nelB; i++)      
     {
         for( j=1; j<=3; j++)        
@@ -504,7 +504,7 @@ void SISTLOCAL()
             printf("*** ERROR*** => MODULO NULO EN SISTEMA LOCAL. SOLIDO B\n"); enExcepcion=1;return;
         }
     }
-    //* Calcula la tercera direccion local de "B"
+    // Calcula la tercera direccion local de "B"
     for( i=1; i<=nelB; i++)      
     {
         locB[i-1][7-1]=locB[i-1][2-1]*locB[i-1][6-1]-locB[i-1][3-1]*locB[i-1][5-1];
@@ -513,17 +513,848 @@ void SISTLOCAL()
     }
     return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:                                                                    *
-//*  Output:                                                                   *
-//*  Usage:                                                                    *
-//*  Description: Subrutina maestra de integracion                             *
-//*                                                                            *
-//******************************************************************************
-//********************************* NOTA ***************************************
-//*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:                                                                    *
+//  Output:                                                                   *
+//  Usage:                                                                    *
+//  Description: Subrutina maestra de integracion                             *
+//                                                                            *
+//*****************************************************************************
+//******************************** NOTA ***************************************
+//    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
+//*****************************************************************************
+
+
+
+void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T)
+{
+    VarPack varPack;
+    int  nd,el;	//Auxiliares
+    int  i,j;
+    double  extraux;
+    double  AE1[3][3],AE2[3][3],AE3[3][3],AE4[3][3],AE5[3][3],AE6[3][3],AE7[3][3];
+    double  BE1[3][3],BE2[3][3],BE3[3][3],BE4[3][3],BE5[3][3],BE6[3][3],BE7[3][3];
+    double  AT1,AT2,AT3,AT4,AT5,AT6,AT7;
+    double  BT1,BT2,BT3,BT4,BT5,BT6,BT7;
+    double  C1[3],C2[3],C3[3],C4[3],C5[3],C6[3],C7[3];
+    double  D1[3][3],D2[3][3],D3[3][3],D4[3][3],D5[3][3],D6[3][3],D7[3][3];
+
+    // Calcula constantes
+    cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
+    cte2=1.0-2.0*nuT;
+    cte3=8.0*(1.0-nuT)*4.0*atan(1.0);
+    cte4=4.0*4.0*atan(1.0);
+    cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
+
+    varPack.tipoSimetria = ObtenerSimetria();
+
+    // Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
+    for( el=1; el<=nelT; el++)
+    {
+        // Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
+        for (nd = 1; nd <= nelT; nd++)
+        {
+            // Asigna punto de colocacion
+            for (i = 1; i <= 3; i++)
+            {
+                varPack.ndCol[i - 1] = ndT[nd - 1][i - 1];
+            }
+            // Asigna tipo de integral
+            varPack.intenum = el != nd;
+
+            // Asigna extremos
+            for (i = 1; i <= 3; i++)
+            {
+                for (j = 1; j <= 3; j++)
+                {
+                    varPack.extr[i - 1][j - 1] = exT[conT[el - 1][i - 1] - 1][j - 1];
+                }
+            }
+
+            INTEGRA(&varPack, AE, BE, &AT, &BT, CTE, DTE);
+            if (enExcepcion == 1)return;
+
+
+            switch (varPack.tipoSimetria)
+            {
+                case NO_SIMETRIA_IMPLICITA:
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        // Cambia de coordenadas los coeficientes elasticos
+                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    }
+                    break;
+
+
+                case SIMETRIA_PLANO_0XY:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum = 1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Combina coeficientes
+                    // Elásticos
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            for( j=1; j<=3; j++)
+                            {
+                                if(j == 3)
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
+                                }
+                                else
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
+                                }
+                            }
+                        }
+                        // Termoelásticos
+                        if(tpproTE == 1)
+                        {
+                            for( i=1; i<=3; i++)
+                            {
+                                CTE[i-1]=CTE[i-1]+C1[i-1];
+                                for( j=1; j<=3; j++)
+                                {
+                                    if(j == 3)
+                                    {
+                                        DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
+                                    }
+                                    else
+                                    {
+                                        DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
+                                    }
+                                }
+                            }
+                        }
+                        // Cambia de coordenadas los coeficientes elasticos y termoelásticos
+                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    }
+                    // Térmicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1;
+                        BT=BT+BT1;
+                    }
+                    break;
+
+
+                case SIMETRIA_PLANO_0XZ:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum=1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Elásticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            for( j=1; j<=3; j++)
+                            {
+                                if(j == 2)
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
+                                }
+                                else
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
+                                }
+                            }
+                        }
+                        // Térmoelásticos
+                        if(tpproTE == 1)
+                        {
+                            for( i=1; i<=3; i++)
+                            {
+                                CTE[i-1]=CTE[i-1]+C1[i-1];
+                                for( j=1; j<=3; j++)
+                                {
+                                    if(j == 2)
+                                    {
+                                        DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
+                                    }
+                                    else
+                                    {
+                                        DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
+                                    }
+                                }
+                            }
+                        }
+                        // Cambia de coordenadas los coeficientes elasticos
+                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    }
+                    // Térmicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1;
+                        BT=BT+BT1;
+                    }
+                    break;
+
+
+
+                case SIMETRIA_PLANO_0YZ:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    varPack.intenum=1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Elasticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            for( j=1; j<=3; j++)
+                            {
+                                if(j == 1)
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
+                                }
+                                else
+                                {
+                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
+                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
+                                }
+                            }
+                        }
+                    }
+                    // Térmoelásticos
+                    if(tpproTE == 1)
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            CTE[i-1]=CTE[i-1]+C1[i-1];
+                            for( j=1; j<=3; j++)
+                            {
+                                if(j == 1)
+                                {
+                                    DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
+                                }
+                                else
+                                {
+                                    DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
+                                }
+                            }
+                        }
+                    }
+                    // Cambia de coordenadas los coeficientes elasticos
+                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+
+                    // Térmicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1;
+                        BT=BT+BT1;
+                    }
+                    break;
+
+
+
+                case SIMETRIA_PLANOS_0XY_0XZ:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum=1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxy y Oxz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+
+                    // Elasticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]+AE3[i-1][1-1];
+                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
+                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]+AE3[i-1][3-1];
+                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]+BE2[i-1][1-1]+BE3[i-1][1-1];
+                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1];
+                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]+BE3[i-1][3-1];
+                        }
+                    }
+                    // Térmoelásticos
+                    if(tpproTE == 1)
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]+D3[i-1][1-1];
+                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
+                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]+D3[i-1][3-1];
+                        }
+                    }
+                    // Cambia de coordenadas los coeficientes elasticos
+                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    // Térmicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1+AT2+AT3;
+                        BT=BT+BT1+BT2+BT3;
+                    }
+                    break;
+
+
+                case SIMETRIA_PLANOS_0XY_0YZ:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum=1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxy y Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+
+                    // Elasticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]-AE2[i-1][1-1]-AE3[i-1][1-1];
+                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]+AE2[i-1][2-1]+AE3[i-1][2-1];
+                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]+AE3[i-1][3-1];
+                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]-BE2[i-1][1-1]-BE3[i-1][1-1];
+                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]+BE2[i-1][2-1]+BE3[i-1][2-1];
+                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]+BE3[i-1][3-1];
+                        }
+                    }
+                    // Térmoelásticos
+                    if(tpproTE == 1)
+                    {
+                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
+                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
+                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
+                        for( i=1; i<=3; i++)
+                        {
+                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]-D2[i-1][1-1]-D3[i-1][1-1];
+                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]+D2[i-1][2-1]+D3[i-1][2-1];
+                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]+D3[i-1][3-1];
+                        }
+                    }
+                    // Cambia de coordenadas los coeficientes elasticos
+                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    // Térmicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1+AT2+AT3;
+                        BT=BT+BT1+BT2+BT3;
+                    }
+                    break;
+
+
+
+
+                case SIMETRIA_PLANOS_0XZ_0YZ:
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum=1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxz y Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+
+
+                    // Integra simetrico Oxz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+
+                    // Elasticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            AE[i-1][1-1]=AE[i-1][1-1]-AE1[i-1][1-1]-AE2[i-1][1-1]+AE3[i-1][1-1];
+                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
+                            AE[i-1][3-1]=AE[i-1][3-1]+AE1[i-1][3-1]+AE2[i-1][3-1]+AE3[i-1][3-1];
+                            BE[i-1][1-1]=BE[i-1][1-1]-BE1[i-1][1-1]-BE2[i-1][1-1]+BE3[i-1][1-1];
+                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1];
+                            BE[i-1][3-1]=BE[i-1][3-1]+BE1[i-1][3-1]+BE2[i-1][3-1]+BE3[i-1][3-1];
+                        }
+                    }
+                    // Térmoelásticos
+                    if(tpproTE == 1)
+                    {
+                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
+                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
+                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
+                        for( i=1; i<=3; i++)
+                        {
+                            DTE[i-1][1-1]=DTE[i-1][1-1]-D1[i-1][1-1]-D2[i-1][1-1]+D3[i-1][1-1];
+                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
+                            DTE[i-1][3-1]=DTE[i-1][3-1]+D1[i-1][3-1]+D2[i-1][3-1]+D3[i-1][3-1];
+                        }
+                    }
+
+                    // Cambia de coordenadas los coeficientes elasticos
+                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+
+                    // Termicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1+AT2+AT3;
+                        BT=BT+BT1+BT2+BT3;
+                    }
+
+                    break;
+
+
+
+                case SIMETRIA_TRES_PLANOS_COORDENADOS:
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    // Asigna tipo de integral
+                    varPack.intenum = 1;
+                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxy y Oxz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxy,Oxz y Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    INTEGRA(&varPack,AE4,BE4,&AT4,&BT4,C4,D4);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxz y Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 3)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE5,BE5,&AT5,&BT5,C5,D5);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 1)
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    // Intercambia extremos 2 y 3
+                    for( i=1; i<=3; i++)
+                    {
+                        extraux=varPack.extr[2-1][i-1];
+                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
+                        varPack.extr[3-1][i-1]=extraux;
+                    }
+                    INTEGRA(&varPack,AE6,BE6,&AT6,&BT6,C6,D6);if(enExcepcion==1)return;
+
+                    // Integra simetrico Oxy y Oyz
+
+                    // Asigna extremos
+                    for( i=1; i<=3; i++)
+                    {
+                        for( j=1; j<=3; j++)
+                        {
+                            if(j == 2)
+                            {
+                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                            }
+                            else
+                            {
+                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            }
+                        }
+                    }
+                    INTEGRA(&varPack,AE7,BE7,&AT7,&BT7,C7,D7);if(enExcepcion==1)return;
+
+                    // Elasticos
+                    // Combina coeficientes
+                    if((tpproE == 1) || (tpproTE == 1))
+                    {
+                        for( i=1; i<=3; i++)
+                        {
+                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]-AE3[i-1][1-1]+AE4[i-1][1-1]-AE5[i-1][1-1]-AE6[i-1][1-1]-AE7[i-1][1-1];
+                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1]-AE4[i-1][2-1]-AE5[i-1][2-1]+AE6[i-1][2-1]+AE7[i-1][2-1];
+                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]-AE3[i-1][3-1]+AE4[i-1][3-1]+AE5[i-1][3-1]+AE6[i-1][3-1]-AE7[i-1][3-1];
+                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]+BE2[i-1][1-1]-BE3[i-1][1-1]+BE4[i-1][1-1]-BE5[i-1][1-1]-BE6[i-1][1-1]-BE7[i-1][1-1];
+                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1]-BE4[i-1][2-1]-BE5[i-1][2-1]+BE6[i-1][2-1]+BE7[i-1][2-1];
+                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]-BE3[i-1][3-1]+BE4[i-1][3-1]+BE5[i-1][3-1]+BE6[i-1][3-1]-BE7[i-1][3-1];
+                        }
+                    }
+                    // Térmoelásticos
+                    if(tpproTE == 1)
+                    {
+                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1]+C4[1-1]+C5[1-1]+C6[1-1]+C7[1-1];
+                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1]+C4[2-1]+C5[2-1]+C6[2-1]+C7[2-1];
+                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1]+C4[3-1]+C5[3-1]+C6[3-1]+C7[3-1];
+                        for( i=1; i<=3; i++)
+                        {
+                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]-D3[i-1][1-1]+D4[i-1][1-1]-D5[i-1][1-1]-D6[i-1][1-1]-D7[i-1][1-1];
+                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1]-D4[i-1][1-1]-D5[i-1][1-1]+D6[i-1][1-1]+D7[i-1][1-1];
+                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]-D3[i-1][3-1]+D4[i-1][1-1]+D5[i-1][1-1]+D6[i-1][1-1]-D7[i-1][1-1];
+                        }
+                    }
+                    // Cambia de coordenadas los coeficientes elasticos
+                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    // Termicos
+                    if((tpproT == 1) || (tpproTE == 1))
+                    {
+                        AT=AT+AT1+AT2+AT3+AT4+AT5+AT6+AT7;
+                        BT=BT+BT1+BT2+BT3+BT4+BT5+BT6+BT7;
+                    }
+                    break;
+
+                case SIMETRIA_ERRONEA:
+                    printf(" **** ERROR **** => Simetrias erroneas\n"); enExcepcion=1;return;
+            }
+
+
+            // Almacena coeficientes
+            reg=(el-1)*nelT+nd;
+            ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+        }
+    }
+
+}
 
 int ObtenerSimetria()
 {
@@ -552,853 +1383,22 @@ int ObtenerSimetria()
     return simetria;
 }
 
-void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T)
-{
-    VarPack varPack;
-    int  nd,el;	//Auxiliares
-    int  i,j;
-    double  extraux;
-    double  AE1[3][3],AE2[3][3],AE3[3][3],AE4[3][3],AE5[3][3],AE6[3][3],AE7[3][3];
-    double  BE1[3][3],BE2[3][3],BE3[3][3],BE4[3][3],BE5[3][3],BE6[3][3],BE7[3][3];
-    double  AT1,AT2,AT3,AT4,AT5,AT6,AT7;
-    double  BT1,BT2,BT3,BT4,BT5,BT6,BT7;
-    double  C1[3],C2[3],C3[3],C4[3],C5[3],C6[3],C7[3];
-    double  D1[3][3],D2[3][3],D3[3][3],D4[3][3],D5[3][3],D6[3][3],D7[3][3];
-
-    //* Calcula constantes
-    cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
-    cte2=1.0-2.0*nuT;
-    cte3=8.0*(1.0-nuT)*4.0*atan(1.0);
-    cte4=4.0*4.0*atan(1.0);
-    cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
-
-    varPack.tipoSimetria = ObtenerSimetria();
-
-    //* Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
-    for( el=1; el<=nelT; el++)
-    {
-        //* Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
-        for (nd = 1; nd <= nelT; nd++)
-        {
-            //* Asigna punto de colocacion
-            for (i = 1; i <= 3; i++)
-            {
-                varPack.ndCol[i - 1] = ndT[nd - 1][i - 1];
-            }
-            //* Asigna tipo de integral
-            varPack.intenum = el != nd;
-
-            //* Asigna extremos
-            for (i = 1; i <= 3; i++)
-            {
-                for (j = 1; j <= 3; j++)
-                {
-                    varPack.extr[i - 1][j - 1] = exT[conT[el - 1][i - 1] - 1][j - 1];
-                }
-            }
-
-            INTEGRA(&varPack, AE, BE, &AT, &BT, CTE, DTE);
-            if (enExcepcion == 1)return;
-
-
-            switch (varPack.tipoSimetria)
-            {
-                case NO_SIMETRIA_IMPLICITA:
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        //* Cambia de coordenadas los coeficientes elasticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    }
-                    break;
-
-
-                case SIMETRIA_PLANO_0XY:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum = 1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Combina coeficientes
-                    //* Elásticos
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            for( j=1; j<=3; j++)
-                            {
-                                if(j == 3)
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
-                                }
-                                else
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
-                                }
-                            }
-                        }
-                        //* Térmoelásticos
-                        if(tpproTE == 1)
-                        {
-                            for( i=1; i<=3; i++)
-                            {
-                                CTE[i-1]=CTE[i-1]+C1[i-1];
-                                for( j=1; j<=3; j++)
-                                {
-                                    if(j == 3)
-                                    {
-                                        DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
-                                    }
-                                    else
-                                    {
-                                        DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
-                                    }
-                                }
-                            }
-                        }
-                        //* Cambia de coordenadas los coeficientes elasticos y termoelásticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    }
-                    //* Térmicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1;
-                        BT=BT+BT1;
-                    }
-                    break;
-
-
-
-                case SIMETRIA_PLANO_0XZ:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Elásticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            for( j=1; j<=3; j++)
-                            {
-                                if(j == 2)
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
-                                }
-                                else
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
-                                }
-                            }
-                        }
-                        //* Térmoelásticos
-                        if(tpproTE == 1)
-                        {
-                            for( i=1; i<=3; i++)
-                            {
-                                CTE[i-1]=CTE[i-1]+C1[i-1];
-                                for( j=1; j<=3; j++)
-                                {
-                                    if(j == 2)
-                                    {
-                                        DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
-                                    }
-                                    else
-                                    {
-                                        DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
-                                    }
-                                }
-                            }
-                        }
-                        //* Cambia de coordenadas los coeficientes elasticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    }
-                    //* Térmicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1;
-                        BT=BT+BT1;
-                    }
-                    break;
-
-
-
-                case SIMETRIA_PLANO_0YZ:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Elasticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            for( j=1; j<=3; j++)
-                            {
-                                if(j == 1)
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]-AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]-BE1[i-1][j-1];
-                                }
-                                else
-                                {
-                                    AE[i-1][j-1]=AE[i-1][j-1]+AE1[i-1][j-1];
-                                    BE[i-1][j-1]=BE[i-1][j-1]+BE1[i-1][j-1];
-                                }
-                            }
-                        }
-                    }
-                    //* Térmoelásticos
-                    if(tpproTE == 1)
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            CTE[i-1]=CTE[i-1]+C1[i-1];
-                            for( j=1; j<=3; j++)
-                            {
-                                if(j == 1)
-                                {
-                                    DTE[i-1][j-1]=DTE[i-1][j-1]-D1[i-1][j-1];
-                                }
-                                else
-                                {
-                                    DTE[i-1][j-1]=DTE[i-1][j-1]+D1[i-1][j-1];
-                                }
-                            }
-                        }
-                    }
-                    //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-
-                    //* Térmicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1;
-                        BT=BT+BT1;
-                    }
-                    break;
-
-
-
-                case SIMETRIA_PLANOS_0XY_0XZ:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxy y Oxz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
-
-                    //* Elasticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]+AE3[i-1][1-1];
-                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
-                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]+AE3[i-1][3-1];
-                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]+BE2[i-1][1-1]+BE3[i-1][1-1];
-                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1];
-                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]+BE3[i-1][3-1];
-                        }
-                    }
-                    //* Térmoelásticos
-                    if(tpproTE == 1)
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]+D3[i-1][1-1];
-                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
-                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]+D3[i-1][3-1];
-                        }
-                    }
-                    //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    //* Térmicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1+AT2+AT3;
-                        BT=BT+BT1+BT2+BT3;
-                    }
-                    break;
-
-
-                case SIMETRIA_PLANOS_0XY_0YZ:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxy y Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
-
-                    //* Elasticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]-AE2[i-1][1-1]-AE3[i-1][1-1];
-                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]+AE2[i-1][2-1]+AE3[i-1][2-1];
-                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]+AE3[i-1][3-1];
-                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]-BE2[i-1][1-1]-BE3[i-1][1-1];
-                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]+BE2[i-1][2-1]+BE3[i-1][2-1];
-                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]+BE3[i-1][3-1];
-                        }
-                    }
-                    //* Térmoelásticos
-                    if(tpproTE == 1)
-                    {
-                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
-                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
-                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
-                        for( i=1; i<=3; i++)
-                        {
-                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]-D2[i-1][1-1]-D3[i-1][1-1];
-                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]+D2[i-1][2-1]+D3[i-1][2-1];
-                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]+D3[i-1][3-1];
-                        }
-                    }
-                    //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    //* Térmicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1+AT2+AT3;
-                        BT=BT+BT1+BT2+BT3;
-                    }
-                    break;
-
-
-
-
-                case SIMETRIA_PLANOS_0XZ_0YZ:
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxz y Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
-
-
-                    //* Integra simetrico Oxz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
-
-                    //* Elasticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            AE[i-1][1-1]=AE[i-1][1-1]-AE1[i-1][1-1]-AE2[i-1][1-1]+AE3[i-1][1-1];
-                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1];
-                            AE[i-1][3-1]=AE[i-1][3-1]+AE1[i-1][3-1]+AE2[i-1][3-1]+AE3[i-1][3-1];
-                            BE[i-1][1-1]=BE[i-1][1-1]-BE1[i-1][1-1]-BE2[i-1][1-1]+BE3[i-1][1-1];
-                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1];
-                            BE[i-1][3-1]=BE[i-1][3-1]+BE1[i-1][3-1]+BE2[i-1][3-1]+BE3[i-1][3-1];
-                        }
-                    }
-                    //* Térmoelásticos
-                    if(tpproTE == 1)
-                    {
-                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1];
-                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1];
-                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1];
-                        for( i=1; i<=3; i++)
-                        {
-                            DTE[i-1][1-1]=DTE[i-1][1-1]-D1[i-1][1-1]-D2[i-1][1-1]+D3[i-1][1-1];
-                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1];
-                            DTE[i-1][3-1]=DTE[i-1][3-1]+D1[i-1][3-1]+D2[i-1][3-1]+D3[i-1][3-1];
-                        }
-                    }
-
-                    //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-
-                    //* Termicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1+AT2+AT3;
-                        BT=BT+BT1+BT2+BT3;
-                    }
-
-                    break;
-
-
-
-                case SIMETRIA_TRES_PLANOS_COORDENADOS:
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    //* Asigna tipo de integral
-                    varPack.intenum = 1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxy y Oxz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxy,Oxz y Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    INTEGRA(&varPack,AE4,BE4,&AT4,&BT4,C4,D4);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxz y Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 3)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE5,BE5,&AT5,&BT5,C5,D5);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 1)
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    //* Intercambia extremos 2 y 3
-                    for( i=1; i<=3; i++)
-                    {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
-                    }
-                    INTEGRA(&varPack,AE6,BE6,&AT6,&BT6,C6,D6);if(enExcepcion==1)return;
-
-                    //* Integra simetrico Oxy y Oyz
-
-                    //* Asigna extremos
-                    for( i=1; i<=3; i++)
-                    {
-                        for( j=1; j<=3; j++)
-                        {
-                            if(j == 2)
-                            {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
-                            }
-                            else
-                            {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
-                            }
-                        }
-                    }
-                    INTEGRA(&varPack,AE7,BE7,&AT7,&BT7,C7,D7);if(enExcepcion==1)return;
-
-                    //* Elasticos
-                    //* Combina coeficientes
-                    if((tpproE == 1) || (tpproTE == 1))
-                    {
-                        for( i=1; i<=3; i++)
-                        {
-                            AE[i-1][1-1]=AE[i-1][1-1]+AE1[i-1][1-1]+AE2[i-1][1-1]-AE3[i-1][1-1]+AE4[i-1][1-1]-AE5[i-1][1-1]-AE6[i-1][1-1]-AE7[i-1][1-1];
-                            AE[i-1][2-1]=AE[i-1][2-1]+AE1[i-1][2-1]-AE2[i-1][2-1]-AE3[i-1][2-1]-AE4[i-1][2-1]-AE5[i-1][2-1]+AE6[i-1][2-1]+AE7[i-1][2-1];
-                            AE[i-1][3-1]=AE[i-1][3-1]-AE1[i-1][3-1]-AE2[i-1][3-1]-AE3[i-1][3-1]+AE4[i-1][3-1]+AE5[i-1][3-1]+AE6[i-1][3-1]-AE7[i-1][3-1];
-                            BE[i-1][1-1]=BE[i-1][1-1]+BE1[i-1][1-1]+BE2[i-1][1-1]-BE3[i-1][1-1]+BE4[i-1][1-1]-BE5[i-1][1-1]-BE6[i-1][1-1]-BE7[i-1][1-1];
-                            BE[i-1][2-1]=BE[i-1][2-1]+BE1[i-1][2-1]-BE2[i-1][2-1]-BE3[i-1][2-1]-BE4[i-1][2-1]-BE5[i-1][2-1]+BE6[i-1][2-1]+BE7[i-1][2-1];
-                            BE[i-1][3-1]=BE[i-1][3-1]-BE1[i-1][3-1]-BE2[i-1][3-1]-BE3[i-1][3-1]+BE4[i-1][3-1]+BE5[i-1][3-1]+BE6[i-1][3-1]-BE7[i-1][3-1];
-                        }
-                    }
-                    //* Térmoelásticos
-                    if(tpproTE == 1)
-                    {
-                        CTE[1-1]=CTE[1-1]+C1[1-1]+C2[1-1]+C3[1-1]+C4[1-1]+C5[1-1]+C6[1-1]+C7[1-1];
-                        CTE[2-1]=CTE[2-1]+C1[2-1]+C2[2-1]+C3[2-1]+C4[2-1]+C5[2-1]+C6[2-1]+C7[2-1];
-                        CTE[3-1]=CTE[3-1]+C1[3-1]+C2[3-1]+C3[3-1]+C4[3-1]+C5[3-1]+C6[3-1]+C7[3-1];
-                        for( i=1; i<=3; i++)
-                        {
-                            DTE[i-1][1-1]=DTE[i-1][1-1]+D1[i-1][1-1]+D2[i-1][1-1]-D3[i-1][1-1]+D4[i-1][1-1]-D5[i-1][1-1]-D6[i-1][1-1]-D7[i-1][1-1];
-                            DTE[i-1][2-1]=DTE[i-1][2-1]+D1[i-1][2-1]-D2[i-1][2-1]-D3[i-1][2-1]-D4[i-1][1-1]-D5[i-1][1-1]+D6[i-1][1-1]+D7[i-1][1-1];
-                            DTE[i-1][3-1]=DTE[i-1][3-1]-D1[i-1][3-1]-D2[i-1][3-1]-D3[i-1][3-1]+D4[i-1][1-1]+D5[i-1][1-1]+D6[i-1][1-1]-D7[i-1][1-1];
-                        }
-                    }
-                    //* Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
-                    //* Termicos
-                    if((tpproT == 1) || (tpproTE == 1))
-                    {
-                        AT=AT+AT1+AT2+AT3+AT4+AT5+AT6+AT7;
-                        BT=BT+BT1+BT2+BT3+BT4+BT5+BT6+BT7;
-                    }
-                    break;
-
-                case SIMETRIA_ERRONEA:
-                    printf(" **** ERROR **** => Simetrias erroneas\n"); enExcepcion=1;return;
-            }
-
-
-            //* Almacena coeficientes
-            reg=(el-1)*nelT+nd;
-            ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
-        }
-    }
-
-}
-
-
-//******************************************************************************
-//*                                                                            *
-//*  Input:  ?                                                                 *
-//*  Output: coeficientes del sistema ax=b                                     *
-//*  Usage:                                                                    *
-//*  Description: Monta el sistema de ecuaciones lineales en funcion de codigos*
-//*               1= temperatura conocida; 2= flujo conocido;3= contacto       *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:  ?                                                                 *
+//  Output: coeficientes del sistema ax=b                                     *
+//  Usage:                                                                    *
+//  Description: Monta el sistema de ecuaciones lineales en funcion de codigos*
+//               1= temperatura conocida; 2= flujo conocido;3= contacto       *
+//*****************************************************************************
 
 void MONTAJETER()
 {
-    //* DEFINICION DE VARIABLES
+    // DEFINICION DE VARIABLES
 
 
     int i,j;	//auxiliar
-    //* Inicializa los valores de los coeficientes
+    // Inicializa los valores de los coeficientes
     for( i=1; i<= nelT; i++)    
     {
         b[i-1]=0.0;
@@ -1407,7 +1407,7 @@ void MONTAJETER()
             a[i-1][j-1]=0.0;
         }
     }
-    //* CUERPO A
+    // CUERPO A
 
     nel=nelA;
     for( i=1; i<=nel; i++)    
@@ -1419,11 +1419,11 @@ void MONTAJETER()
         hf[i-1]=ccA[i-1][10-1];
 
     }
-    //* Abre ficheros
+    // Abre ficheros
     //open(unit=in1s,file='coe_AT_A.dat',status='unknown',access='direct',form='unformatted',recl=72)
     //open(unit=in2s,file='coe_BT_A.dat',status='unknown',access='direct',form='unformatted',recl=72)
 
-    //* lee coeficientes de la ecuacion
+    // lee coeficientes de la ecuacion
     for( i=1; i<=nel; i++)    
     {
         for( j=1; j<=nel; j++)      
@@ -1458,7 +1458,7 @@ void MONTAJETER()
     //close(unit=in1s)
     //close(unit=in2s)
 
-    //* CUERPO B
+    // CUERPO B
 
     nel=nelB;
     for( i=1; i<=nel; i++)    
@@ -1470,11 +1470,11 @@ void MONTAJETER()
         hf[i-1]=ccB[i-1][10-1];
 
     }
-    //* Abre ficheros
+    // Abre ficheros
     //open(unit=in3s,file='coe_AT_B.dat',status='unknown',access='direct',form='unformatted',recl=72)
     //open(unit=in4s,file='coe_BT_B.dat',status='unknown',access='direct',form='unformatted',recl=72)
 
-    //* lee coeficientes de la ecuacion
+    // lee coeficientes de la ecuacion
     for( i=1; i<=nel; i++)    
     {
         for( j=1; j<=nel; j++)      
@@ -1502,7 +1502,7 @@ void MONTAJETER()
             }
             if((codT[j-1] == 3) || (codT[j-1] == 5))        
             {
-                //* Este termino incluye el contacto imperfecto y la resistencia debida a un material intermedio
+                // Este termino incluye el contacto imperfecto y la resistencia debida a un material intermedio
                 a[i+nelA-1][j-1]=AT;
                 a[i+nelA-1][j+nelA-1]=-BT-lamB*RTC[j-1]*AT;
             }
@@ -1513,15 +1513,15 @@ void MONTAJETER()
 
     return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:                                                                    *
-//*  Output: variables                                                         *
-//*  Usage:                                                                    *
-//*  Description:  algoritmo de resolucion de un sistema de                    *
-//*            ecuaciones por el metodo de GAUSS                               *
-//*                                                                            *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:                                                                    *
+//  Output: variables                                                         *
+//  Usage:                                                                    *
+//  Description:  algoritmo de resolucion de un sistema de                    *
+//            ecuaciones por el metodo de GAUSS                               *
+//                                                                            *
+//*****************************************************************************
 void GAUSS_SOLU()
 {
     int i,j,k,np;
@@ -1612,24 +1612,24 @@ void GAUSS_SOLU()
 
     return;
 }
-//******************************************************************************
-//*                                                                            *
-//*  Input:  ?                                                                 *
-//*  Output: RESULTADOS TERMICOS EN EL CONTORNO DE LOS DOS CUERPOS             *
-//*  Usage:                                                                    *
-//*  Description: Ordena e interpreta el vector que contiene las variables     *
-//*              termicas e impone las condiciones de contorno en la zona      *
-//*            de contacto.                                                    *
-//******************************************************************************
+//*****************************************************************************
+//                                                                            *
+//  Input:  ?                                                                 *
+//  Output: RESULTADOS TERMICOS EN EL CONTORNO DE LOS DOS CUERPOS             *
+//  Usage:                                                                    *
+//  Description: Ordena e interpreta el vector que contiene las variables     *
+//              termicas e impone las condiciones de contorno en la zona      *
+//            de contacto.                                                    *
+//*****************************************************************************
 
 
 void CONTORNOTER()
 {
-    //* variables utilizadas
+    // variables utilizadas
 
 
     int i;
-    //* CUERPO A
+    // CUERPO A
     for( i=1; i<=nelA; i++)    
     {
         codT[i-1]=codA[i-1][2-1];
@@ -1660,7 +1660,7 @@ void CONTORNOTER()
             flujA[i-1]=-lamB/lamA*x[i+nelA-1];
         }
     }
-    //* CUERPO B
+    // CUERPO B
     for( i=1; i<=nelB; i++)    
     {
         codT[i-1]=codB[i-1][2-1];
@@ -1685,7 +1685,7 @@ void CONTORNOTER()
             tempB[i-1]=x[i+nelA-1];
             flujB[i-1]=-hf[i-1]/lamB*(x[i+nelA-1]-tf[i-1]);
         }
-        //* Con resistencia termica
+        // Con resistencia termica
         if((codT[i-1] == 3) || (codT[i-1] == 5))      
         {
             tempB[i-1]=x[i-1]-lamB*RTC[i-1]*x[i+nelA-1];
@@ -1694,16 +1694,16 @@ void CONTORNOTER()
     }
     return;
 }
-//**********************************************************************
+//*********************************************************************
 
 void SALIDATER()
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int i;
 
-    //* abre ficheros de salida
+    // abre ficheros de salida
     out2s = fopen(nomArchSalTer, "w");
 
     fprintf(out2s," %s",titulo);	// Formato: 5
@@ -1712,19 +1712,19 @@ void SALIDATER()
     fprintf(out2s," VECTOR DE CARGA TÉRMICA: TEMPERATURAS Y GRADIENTES TÉRMICOS\n");	// Formato: 30
     fprintf(out2s," \n");	// Formato: 20
 
-    //* CUERPO A
+    // CUERPO A
 
     fprintf(out2s," ==================== CUERPO A ====================\n");	// Formato: 35
     fprintf(out2s,"  - Zona de contacto -\n");	// Formato: 40
 
 
-    //*  Zona de contacto de A
+    //  Zona de contacto de A
     //write(out2s,50)
     for( i=1; i<=nelpc; i++)    
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempA[i-1],flujA[i-1]);		// Formato: 100
     }
-    //*  Zona libre de A
+    //  Zona libre de A
     fprintf(out2s,"  - Zona libre -\n");	// Formato: 60
     //write(out2s,50)
     for( i=nelpc+1; i<=nelA; i++)    
@@ -1733,30 +1733,30 @@ void SALIDATER()
     }
     fprintf(out2s," \n");	// Formato: 20
 
-    //* CUERPO B
+    // CUERPO B
     fprintf(out2s," ==================== CUERPO B ====================\n");	// Formato: 55
     fprintf(out2s,"  - Zona de contacto -\n");	// Formato: 40
 
 
-    //*  Zona de contacto de B
+    //  Zona de contacto de B
     //write(out2s,50)
 
     for( i=1; i<=nelpc; i++)        
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempB[i-1],flujB[i-1]);		// Formato: 100
     }
-    //*  Zona libre de B
+    //  Zona libre de B
     fprintf(out2s,"  - Zona libre -\n");	// Formato: 60
     //write(out2s,50)
     for( i=nelpc+1; i<=nelB; i++)        
     {
         fprintf(out2s," %4d %12.4f %12.4f\n",i,tempB[i-1],flujB[i-1]);		// Formato: 100
     }
-    //*  Cierra fichero
+    //  Cierra fichero
 
     fclose(out2s);
 
-    //* Formatos
+    // Formatos
     //5   format(1X,80A);
     //10  format(1X,'Resultados problema térmico de contacto');
     //20  format(1X,'');
@@ -1770,20 +1770,20 @@ void SALIDATER()
 
     return;
 }
-//************************************************************************
-//*       SUBRUTINA QUE MONTA LA PARTE DE LA  MATRIZ  PERTENECIENTE      *
-//*                        A LA ZONA LIBRE.                              *
-//************************************************************************
+//***********************************************************************
+//       SUBRUTINA QUE MONTA LA PARTE DE LA  MATRIZ  PERTENECIENTE      *
+//                        A LA ZONA LIBRE.                              *
+//***********************************************************************
 
 void NOCONTA(int* punteroA_el,int* punteroA_nd)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
 
     int el=*punteroA_el;int nd=*punteroA_nd;int i;int j;;
 
-    //* Codigo 1
+    // Codigo 1
     if(cod == 1)      
     {
         for( i=1; i<=3; i++)            
@@ -1794,7 +1794,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
                 b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][j-1]*cc[j-1];
             }
         }
-        //* Codigo 2
+        // Codigo 2
     }
     else if(cod == 2)      
     {
@@ -1808,7 +1808,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             a[3*(nel+nd-1)+i-1][3*(nel+el)-1]=AE[i-1][3-1];
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][3-1]*cc[6-1];
         }
-        //* Codigo 3
+        // Codigo 3
     }
     else if(cod == 3)      
     {
@@ -1821,7 +1821,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][2-1]*cc[5-1];
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][3-1]*cc[3-1];
         }
-        //* Codigo 4
+        // Codigo 4
     }
     else if(cod == 4)      
     {
@@ -1835,7 +1835,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             a[3*(nel+nd-1)+i-1][3*(nel+el)-2-1]=-BE[i-1][1-1]*Emedia;
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][1-1]*cc[1-1];
         }
-        //* Codigo 5
+        // Codigo 5
     }
     else if(cod == 5)      
     {
@@ -1849,7 +1849,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             a[3*(nel+nd-1)+i-1][3*(nel+el)-2-1]=AE[i-1][1-1];
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][1-1]*cc[4-1];
         }
-        //* Codigo 6
+        // Codigo 6
     }
     else if(cod == 6)      
     {
@@ -1862,7 +1862,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][2-1]*cc[2-1];
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]+BE[i-1][3-1]*cc[6-1];
         }
-        //* Codigo 7
+        // Codigo 7
     }
     else if(cod == 7)      
     {
@@ -1876,7 +1876,7 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
             a[3*(nel+nd-1)+i-1][3*(nel+el)-1]=-BE[i-1][3-1]*Emedia;
             b[3*(nel+nd-1)+i-1]=b[3*(nel+nd-1)+i-1]-AE[i-1][3-1]*cc[3-1];
         }
-        //* Codigo 8
+        // Codigo 8
     }
     else if(cod == 8)      
     {
@@ -1891,13 +1891,13 @@ void NOCONTA(int* punteroA_el,int* punteroA_nd)
     }
     *punteroA_el = el; *punteroA_nd = nd; return;
 }
-//************************************************************************
-//*       SUBRUTINA PARA INTERPRETAR RESULTADOS EN LA ZONA LIBRE         *
-//************************************************************************
+//***********************************************************************
+//       SUBRUTINA PARA INTERPRETAR RESULTADOS EN LA ZONA LIBRE         *
+//***********************************************************************
 
 void INTLIBR(int* punteroA_j,int* punteroA_ix)
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int ix=*punteroA_ix;;	//parametro para identificar la numeración de las variables.
@@ -1905,56 +1905,56 @@ void INTLIBR(int* punteroA_j,int* punteroA_ix)
 
     if(ix == 0)      
     {
-        //* Cuerpo "A"
-        //* Codigo 1
+        // Cuerpo "A"
+        // Codigo 1
         if(codA[j-1][1-1] == 1)            
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 2
+            // Codigo 2
         }
         else if(codA[j-1][1-1] == 2)            
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 3
+            // Codigo 3
         }
         else if(codA[j-1][1-1] == 3)            
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 4
+            // Codigo 4
         }
         else if(codA[j-1][1-1] == 4)            
         {
             ccA[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 5
+            // Codigo 5
         }
         else if(codA[j-1][1-1] == 5)            
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 6
+            // Codigo 6
         }
         else if(codA[j-1][1-1] == 6)            
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccA[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 7
+            // Codigo 7
         }
         else if(codA[j-1][1-1] == 7)            
         {
             ccA[j-1][1-1]=x[ix+3*j-2-1];
             ccA[j-1][2-1]=x[ix+3*j-1-1];
             ccA[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 8
+            // Codigo 8
         }
         else if(codA[j-1][1-1] == 8)            
         {
@@ -1965,56 +1965,56 @@ void INTLIBR(int* punteroA_j,int* punteroA_ix)
     }
     else      
     {
-        //* Cuerpo "B"
-        //* Codigo 1
+        // Cuerpo "B"
+        // Codigo 1
         if(codB[j-1][1-1] == 1)            
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 2
+            // Codigo 2
         }
         else if(codB[j-1][1-1] == 2)            
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 3
+            // Codigo 3
         }
         else if(codB[j-1][1-1] == 3)            
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 4
+            // Codigo 4
         }
         else if(codB[j-1][1-1] == 4)            
         {
             ccB[j-1][4-1]=x[ix+3*j-2-1]*Emedia;
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 5
+            // Codigo 5
         }
         else if(codB[j-1][1-1] == 5)            
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 6
+            // Codigo 6
         }
         else if(codB[j-1][1-1] == 6)            
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][5-1]=x[ix+3*j-1-1]*Emedia;
             ccB[j-1][3-1]=x[ix+3*j-1];
-            //* Codigo 7
+            // Codigo 7
         }
         else if(codB[j-1][1-1] == 7)            
         {
             ccB[j-1][1-1]=x[ix+3*j-2-1];
             ccB[j-1][2-1]=x[ix+3*j-1-1];
             ccB[j-1][6-1]=x[ix+3*j-1]*Emedia;
-            //* Codigo 8
+            // Codigo 8
         }
         else if(codB[j-1][1-1] == 8)            
         {
@@ -2025,34 +2025,34 @@ void INTLIBR(int* punteroA_j,int* punteroA_ix)
     }
     *punteroA_j = j; *punteroA_ix = ix; return;
 }
-//************************************************************************
-//*              SUBRUTINA PARA EL CHEQUEO DE TRACCIONES                 *
-//************************************************************************
+//***********************************************************************
+//              SUBRUTINA PARA EL CHEQUEO DE TRACCIONES                 *
+//***********************************************************************
 
 void CHETRAC()
 {
-    //* Declaracion de variables
-    /*
+    // Declaracion de variables
+
     printf("nelpc = %d",nelpc);
     for(int t=0;t<nelpc;t++)
     {
         printf("ccA[%d][3] = %12.4f\n",t,ccA[t][3]);
         char tDavid;
         if(t+1 % 50 == 0)
-        scanf("%c",tDavid);
+        scanf("%c",&tDavid);
     }
-    */
+
 
     int nd,j;	//auxiliar
 
-    //* Chequea tracciones
+    // Chequea tracciones
     for( nd=1; nd<=nelpc; nd++)      
     {
         if((((tpproT == 1) || (tpproTE == 1)) && (codA[nd-1][2-1] == 3)) || ((tpproE == 1) && (codA[nd-1][1-1] == 9)))         
         {
             if(ccA[nd-1][4-1] < 0.0 )           
             {
-                //*                  write(out1s,50)nd,ccA(nd,4),codA(nd,1)
+                //                  write(out1s,50)nd,ccA(nd,4),codA(nd,1)
             }
             else            
             {
@@ -2068,7 +2068,7 @@ void CHETRAC()
 
                 if(tip == 0)                  
                 {
-                    //*sin intercambio de calor en los despegues
+                    //sin intercambio de calor en los despegues
 
                     codA[nd-1][2-1]=2;
                     codB[nd-1][2-1]=2;
@@ -2079,7 +2079,7 @@ void CHETRAC()
                 }
                 else if(tip == 1)                   
                 {
-                    //* Convección libre
+                    // Convección libre
 
                     codA[nd-1][2-1]=5;
                     codB[nd-1][2-1]=5;
@@ -2089,7 +2089,7 @@ void CHETRAC()
                 }
                 else if(tip == 2)                   
                 {
-                    //* convección forzada
+                    // convección forzada
 
                     codA[nd-1][2-1]=4;
                     codB[nd-1][2-1]=4;
@@ -2102,7 +2102,7 @@ void CHETRAC()
                 }
                 else if(tip == 3)                   
                 {
-                    //* conducción NO VA BIEN
+                    // conducción NO VA BIEN
 
                     //xgap=abs(-(ccA(nd,1)+ccB(nd,1)-gap(nd)))
                     //RTC(nd)=(xgap+sigA+sigB)/kg
@@ -2111,41 +2111,41 @@ void CHETRAC()
             }
         }
     }
-    //*10     format(1x,'+++++++++++++++++++++')
-    //*20     format(2x,'======== CHEQUEO DE TRACCIONES ========')
-    //*30     format(5x,'NODO',6X,'T1',5x,'Nuevo Codigo')
-    //*50     format(3X,I4,1x,E10.4,7x,I4)
+    //10     format(1x,'+++++++++++++++++++++')
+    //20     format(2x,'======== CHEQUEO DE TRACCIONES ========')
+    //30     format(5x,'NODO',6X,'T1',5x,'Nuevo Codigo')
+    //50     format(3X,I4,1x,E10.4,7x,I4)
 
 
     return;
 }
-//************************************************************************
-//*       SUBRUTINA PARA EL CALCULO Y CHEQUEO DE INTERPENETRACIONES      *
-//************************************************************************
+//***********************************************************************
+//       SUBRUTINA PARA EL CALCULO Y CHEQUEO DE INTERPENETRACIONES      *
+//***********************************************************************
 
 void CHEINTE()
 {
-    //* Declaracion de variables
+    // Declaracion de variables
 
 
     int nd;	//auxiliar
     double xgap;
 
-    //* Calcula la separacion entre los pares de contacto ( gap )
+    // Calcula la separacion entre los pares de contacto ( gap )
 
     for( nd=1; nd<=nelpc; nd++)      
     {
         xgap=-(ccA[nd-1][1-1]+ccB[nd-1][1-1]-gap[nd-1]);
-        //* Chequea interpenetraciones
+        // Chequea interpenetraciones
         if(xgap >= 0. )            
         {
-            //*                  write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
+            //                  write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
         }
         else            
         {
             if(fabs(xgap) < 1.0E-10 )                  
             {
-                //*                        write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
+                //                        write(out1s,50)nd,gap(nd),xgap,codA(nd,1)
             }
             else                  
             {
@@ -2157,9 +2157,9 @@ void CHEINTE()
             }
         }
     }
-    //*20     format(2x,'======== INTERPENETRACIONES =======')
-    //*30     format(1x,'Par',9x,'gap',9x,'xgap',9x,'Nuevo Codigo')
-    //*50     format(1x,I4,1x,E10.4,1x,E10.4,7x,I4)
+    //20     format(2x,'======== INTERPENETRACIONES =======')
+    //30     format(1x,'Par',9x,'gap',9x,'xgap',9x,'Nuevo Codigo')
+    //50     format(1x,I4,1x,E10.4,1x,E10.4,7x,I4)
 
     return;
 }

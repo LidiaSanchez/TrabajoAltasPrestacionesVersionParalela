@@ -24,9 +24,9 @@ int main(void)
     int  iCod;
 
     //de solu...
-    double  eps;
+    //double  eps;
     int i,j,contador,contres;	//auxiliar
-    char fich_parciales[80];
+    //char fich_parciales[80];
 
     //* Comienzo del programa
     tinicio = clock()/CLOCKS_PER_SEC;
@@ -170,7 +170,7 @@ int main(void)
 
     strcpy(nomArchSalTer, FICHERO_TERM);
     strcpy(nomArchSalElas, FICHERO_ELAST);
-    eps=1.0E-06;
+    //eps=1.0E-06;
     ifla=1;
     chires=0;
 

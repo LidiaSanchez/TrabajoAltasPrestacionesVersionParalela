@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc -o solidos src/variables.c src/solidos.c src/funcionesPersonales.c src/funcionesD.c src/funcionesA.c src/funcionesMain.c src/funcionesB.c src/funcionesC.c -lm
+nvcc -o solidos src/variables.cu src/solidos.cu src/funcionesPersonales.cu src/funcionesD.cu src/funcionesA.cu src/funcionesMain.cu src/funcionesB.cu src/funcionesC.cu -lm

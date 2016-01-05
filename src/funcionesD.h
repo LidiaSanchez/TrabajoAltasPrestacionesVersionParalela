@@ -16,7 +16,7 @@
 //*                                                                            *
 //*                                                                            *
 //******************************************************************************
-void GAUSS(double punt[7][3]);
+void GAUSS(VarPack* varPack, double punt[7][3]);
 
 #endif /* FUNCIONESD_H_ */
 

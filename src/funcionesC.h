@@ -19,7 +19,7 @@
 //*                                                                                      *
 //****************************************************************************************
 
-void ANALITICA(double AEA[3][3],double BEA[3][3],double* punteroA_ATA,double* punteroA_BTA,double CTEA[3],double DTEA[3][3],double n[3],double bar[3]);
+void ANALITICA(VarPack* varPack, double AEA[3][3],double BEA[3][3],double* punteroA_ATA,double* punteroA_BTA,double CTEA[3],double DTEA[3][3],double n[3],double bar[3]);
 
 
 //******************************************************************************
@@ -59,6 +59,6 @@ void SUBDIVIDE(double extrs[4][3],double subextr[4][4][3]);
 //*                                                                                      *
 //****************************************************************************************
 
-void NUMERICA(double AEN[3][3],double BEN[3][3],double* punteroA_ATN,double* punteroA_BTN,double CTEN[3],double DTEN[3][3],double n[3],double* punteroA_distancia);
+void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punteroA_ATN,double* punteroA_BTN,double CTEN[3],double DTEN[3][3],double n[3],double* punteroA_distancia);
 #endif /* FUNCIONESC_H_ */
 

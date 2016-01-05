@@ -31,7 +31,7 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod);
 //*                                                                            *
 //******************************************************************************
 
-void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3]);
+void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3]);
 //******************************************************************************
 //*                                                                            *
 //*  Input:       el = elemento sobre el que se ha integrado                   *

@@ -58,12 +58,10 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod)
 //*                                                                            *
 //******************************************************************************
 
-void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
+void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
 {
     //* Declaracion de variables
 
-
-    int intenum=*punteroA_intenum;;	//tipo de integracion
     /*double AET[3][3];*	//*double BET[3][3];*/;      //Coeficientes de integracion elasticos
     double ATT=*punteroA_ATT;double BTT=*punteroA_BTT;;	//Coeficientes de integracion termicos
     /*double CT[3];*	//*double DT[3][3];*/;      //Coeficientes de integracion termoelasticos
@@ -84,8 +82,8 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
     //* Asigna cuarto extremo y calcula baricentro del elemento
     for( i=1; i<=3; i++)      
     {
-        extr[4-1][i-1]=extr[1-1][i-1];
-        bar[i-1]=(extr[1-1][i-1]+extr[2-1][i-1]+extr[3-1][i-1])/3.0;
+        varPack->extr[4-1][i-1]=varPack->extr[1-1][i-1];
+        bar[i-1]=(varPack->extr[1-1][i-1]+varPack->extr[2-1][i-1]+varPack->extr[3-1][i-1])/3.0;
     }
     //* Calcula los lados de los elementos
     for( i=1; i<=3; i++)        
@@ -93,7 +91,7 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
         lado[i-1]=0.0;
         for( j=1; j<=3; j++)          
         {
-            lado[i-1]=lado[i-1]+pow((extr[i+1-1][j-1]-extr[i-1][j-1]),2);
+            lado[i-1]=lado[i-1]+pow((varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1]),2);
         }
         lado[i-1]=sqrt(lado[i-1]);
     }
@@ -101,7 +99,7 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
     {
         for( j=1; j<=3; j++)        
         {
-            lad[i-1][j-1]= (extr[i+1-1][j-1]-extr[i-1][j-1])/lado[i-1];
+            lad[i-1][j-1]= (varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1])/lado[i-1];
         }
     }
     //* Calcula el vector normal
@@ -110,9 +108,15 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
     n[3-1]=-lad[1-1][1-1]*lad[3-1][2-1]+lad[1-1][2-1]*lad[3-1][1-1];
 
     //* Decide el tipo de integracion
-    if(intenum == 0)      
+    if(!varPack->intenum)
     {
-        ANALITICA(AET,BET,&ATT,&BTT,CT,DT,n,bar);if(enExcepcion==1)return;
+#ifdef DEBUG_TIMES
+        printf("[INTEGRA()] Analitica() called.\n");
+#endif
+        ANALITICA(varPack, AET,BET,&ATT,&BTT,CT,DT,n,bar);if(enExcepcion==1)return;
+#ifdef DEBUG_TIMES
+        printf("[INTEGRA()] Analitica() returned.\n");
+#endif
     }
     else      
     {
@@ -121,7 +125,7 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
         distancia=0.0;
         for( i=1; i<=3; i++)          
         {
-            dis[i-1]=(bar[i-1]-ndCol[i-1]);
+            dis[i-1]=(bar[i-1]-varPack->ndCol[i-1]);
             dist=dist+pow(dis[i-1],2);
             distancia=distancia+dis[i-1]*n[i-1];
         }
@@ -137,10 +141,17 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
             {
                 for( j=1; j<=3; j++)              
                 {
-                    extrs[i-1][j-1]=extr[i-1][j-1];
+                    extrs[i-1][j-1]=varPack->extr[i-1][j-1];
                 }
             }
+#ifdef DEBUG_TIMES
+            printf("[INTEGRA()] Subdivide() called. (1)\n");
+#endif
             SUBDIVIDE(extrs, subex);if(enExcepcion==1)return;
+#ifdef DEBUG_TIMES
+            printf("[INTEGRA()] Subdivide() returned. (1)\n");
+#endif
+
             for( i=1; i<=4; i++)          
             {
                 for( j=1; j<=4; j++)            
@@ -160,7 +171,7 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
                 for( j=1; j<=3; j++)            
                 {
                     bar[j-1]=(subextr[i-1][1-1][j-1]+subextr[i-1][2-1][j-1]+subextr[i-1][3-1][j-1])/3.0;
-                    dist=dist+pow((ndCol[j-1]-bar[j-1]),2);
+                    dist=dist+pow((varPack->ndCol[j-1]-bar[j-1]),2);
                     lado[j-1]=0.0;
                     for( m=1; m<=3; m++)              
                     {
@@ -180,7 +191,13 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
                             extrs[j-1][m-1]=subextr[i-1][j-1][m-1];
                         }
                     }
+#ifdef DEBUG_TIMES
+                    printf("[INTEGRA()] Subdivide() called. (2)\n");
+#endif
                     SUBDIVIDE(extrs, subex);if(enExcepcion==1)return;
+#ifdef DEBUG_TIMES
+                    printf("[INTEGRA()] Subdivide() returned. (2)\n");
+#endif
 
                     for( j=1; j<=4; j++)              
                     {
@@ -229,11 +246,16 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
                 {
                     for( m=1; m<=3; m++)                
                     {
-                        extr[j-1][m-1]=subextr[i-1][j-1][m-1];
+                        varPack->extr[j-1][m-1]=subextr[i-1][j-1][m-1];
                     }
                 }
-                NUMERICA(AEP,BEP,&ATP,&BTP,CP,DP,n,&distancia);if(enExcepcion==1)return;
-
+#ifdef DEBUG_TIMES
+                printf("[INTEGRA()] Numerica() called.\n");
+#endif
+                NUMERICA(varPack, AEP,BEP,&ATP,&BTP,CP,DP,n,&distancia);if(enExcepcion==1)return;
+#ifdef DEBUG_TIMES
+                printf("[INTEGRA()] Numerica() returned.\n");
+#endif
                 if((tpproE == 1) || (tpproTE == 1))            
                 {
                     for( j=1; j<=3; j++)                
@@ -268,10 +290,10 @@ void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* pun
             //* No hay que subdividir
             //write(*,*) '  no subdivision'
             //write(*,*) '   NUMÉRICA'
-            NUMERICA(AET,BET,&ATT,&BTT,CT,DT,n,&distancia);if(enExcepcion==1)return;
+            NUMERICA(varPack, AET,BET,&ATT,&BTT,CT,DT,n,&distancia);if(enExcepcion==1)return;
         }
     }
-    *punteroA_intenum = intenum; *punteroA_ATT = ATT; *punteroA_BTT = BTT; return;
+    *punteroA_ATT = ATT; *punteroA_BTT = BTT; return;
 }
 //******************************************************************************
 //*                                                                            *
@@ -291,7 +313,7 @@ void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el)
     int el=*punteroA_el;;	//Elemento sobre el que se ha integrado
     int  i,j;	//Auxiliares
     double ccc[3][3];/*double AETR[3][3];*	//*double BETR[3][3];*/;
-    //real*8  cct(3),CTR(3),DTR(3,3)
+
     //* Realiza transformacion
 
     //* Coeficientes elásticos
@@ -322,24 +344,7 @@ void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el)
             BETR[i-1][j-1]=ccc[i-1][j-1];
         }
     }
-    //* Coeficientes termoelásticos
-    //do i=1,3
-    //ccc(i,1)=DTR(i,1)*locT(el,1)+DTR(i,2)*locT(el,2)+DTR(i,3)*locT(el,3)
-    //ccc(i,2)=DTR(i,1)*locT(el,4)+DTR(i,2)*locT(el,5)+DTR(i,3)*locT(el,6)
-    //ccc(i,3)=DTR(i,1)*locT(el,7)+DTR(i,2)*locT(el,8)+DTR(i,3)*locT(el,9)
-    //enddo
-    //do i=1,3
-    //do j=1,3
-    //DTR(i,j)=ccc(i,j)
-    //enddo
-    //enddo
 
-    //cct(1)=CTR(1)*locT(el,1)+CTR(2)*locT(el,2)+CTR(3)*locT(el,3)
-    //cct(2)=CTR(1)*locT(el,4)+CTR(2)*locT(el,5)+CTR(3)*locT(el,6)
-    //cct(3)=CTR(1)*locT(el,7)+CTR(2)*locT(el,8)+CTR(3)*locT(el,9)
-    //do i=1,3
-    //CTR(i)=cct(i)
-    //enddo
     *punteroA_el = el; return;
 }
 //******************************************************************************
@@ -359,9 +364,6 @@ void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,doub
     int el=*punteroA_el;int nd=*punteroA_nd;;	//Elemento sobre el que se ha integrado y nodo
     int  i,j;	//Auxiliares
 
-    /*double AE_T[3*nelT][3*nelT];*	//*double BE_T[3*nelT][3*nelT];*/;
-    /*double AT_T[nelT][nelT];*	//*double BT_T[nelT][nelT];*/;
-    /*double CTE_T[3*nelT][nelT];*	//*double DTE_T[3*nelT][nelT];*/;
 
     //* Coeficientes elasticos
     if((tpproE == 1) || (tpproTE == 1))      
@@ -383,22 +385,13 @@ void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,doub
             arTemp_7 += 1;BE_T[arTemp_4-1][arTemp_5-1] = BE[arTemp_6-1][arTemp_7-1];
             }
         }
-        ;
-        //write(unit=out1,rec=reg)AE
-        //write(unit=out2,rec=reg)BE
-
-        //write(out11,*)AE(1,1),AE(1,2),AE(1,3),AE(2,1),AE(2,2),AE(2,3),AE(3,1),AE(3,2),AE(3,3)
-        //write(out12,*)BE(1,1),BE(1,2),BE(1,3),BE(2,1),BE(2,2),BE(2,3),BE(3,1),BE(3,2),BE(3,3)
     }
     //* Coeficientes termicos
     if((tpproT == 1) || (tpproTE == 1))     
     {
         AT_T[el-1][nd-1]=AT;
         BT_T[el-1][nd-1]=BT;
-        //write(unit=out3,rec=reg)AT
-        //write(out13,*)AT
-        //write(unit=out4,rec=reg)BT
-        //write(out14,*)BT
+
     }
     //* Coeficientes termoelasticos
     if(tpproTE == 1)     
@@ -431,11 +424,7 @@ void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,doub
             DTE_T[arTemp_11-1][arTemp_12-1] = DTTE[arTemp_13-1];
             }
         }
-        ;
-        //write(unit=out5,rec=reg)CTE
-        //write(unit=out6,rec=reg)DTTE
-        //write(out15,*)CTE
-        //write(out16,*)DTTE
+
     }
     *punteroA_el = el; *punteroA_nd = nd; return;
 

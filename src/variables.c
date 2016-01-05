@@ -146,9 +146,9 @@ double  anguv[MAX_EL];// Ángulo de deslizamiento
 double  ve2[MAX_EL];// Componente 2 del deslizamiento relativo
 double  ve3[MAX_EL];// Componente 3 del deslizamiento relativo
 
-double  ndCol[3];// Coordenadas del nodo de colocacion
+//double  ndCol[3];// Coordenadas del nodo de colocacion
 double  nelInte;// Numero del elemento sobre el que se integra
-double  extr[4][3];// Extremos del elemento sobre el que se integra
+//double  extr[4][3];// Extremos del elemento sobre el que se integra
 
 long int  reg;// Registro del fichero de coeficientes
 

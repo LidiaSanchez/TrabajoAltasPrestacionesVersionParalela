@@ -14,6 +14,28 @@
 #define FICHERO_ELAST "datos/elast.dat"
 
 //#define DEBUG 0
+//#define DEBUG_TIMES
+
+enum SIMETRIAS
+{
+    SIMETRIA_ERRONEA                    =  -1,
+    NO_SIMETRIA_IMPLICITA               =   0,
+    SIMETRIA_PLANO_0XY                  =   1,
+    SIMETRIA_PLANO_0XZ                  =   2,
+    SIMETRIA_PLANO_0YZ                  =   3,
+    SIMETRIA_PLANOS_0XY_0XZ             =   4,
+    SIMETRIA_PLANOS_0XY_0YZ             =   5,
+    SIMETRIA_PLANOS_0XZ_0YZ             =   6,
+    SIMETRIA_TRES_PLANOS_COORDENADOS    =   7
+};
+
+typedef struct VarPack
+{
+    double ndCol[3];
+    char intenum;
+    int tipoSimetria;
+    double extr[4][3];
+} VarPack;
 
 extern int enExcepcion;
 
@@ -161,9 +183,9 @@ extern double  anguv[MAX_EL];// Ángulo de deslizamiento
 extern double  ve2[MAX_EL];// Componente 2 del deslizamiento relativo
 extern double  ve3[MAX_EL];// Componente 3 del deslizamiento relativo
 
-extern double  ndCol[3];// Coordenadas del nodo de colocacion
+//extern double  ndCol[3];// Coordenadas del nodo de colocacion
 extern double  nelInte;// Numero del elemento sobre el que se integra
-extern double  extr[4][3];// Extremos del elemento sobre el que se integra
+//extern double  extr[4][3];// Extremos del elemento sobre el que se integra
 
 extern long int  reg;// Registro del fichero de coeficientes
 

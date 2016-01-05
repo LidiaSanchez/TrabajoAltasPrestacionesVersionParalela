@@ -1,6 +1,6 @@
 #include "funcionesD.h"
 
-void GAUSS(double punt[7][3])
+void GAUSS(VarPack* varPack, double punt[7][3])
 {
     //* Declaracion de variables
 
@@ -46,7 +46,7 @@ void GAUSS(double punt[7][3])
     for( p=0; p<7; p++)        
         for( i=0; i<3; i++)            
             for( j=0; j<3; j++)                
-                punt[p][i]=punt[p][i]+cnat[p][j]*extr[j][i];
+                punt[p][i]=punt[p][i]+cnat[p][j]*varPack->extr[j][i];
 
     return;
 }

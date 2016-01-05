@@ -28,6 +28,8 @@
 //#define DEBUG 0
 //#define DEBUG_TIMES
 
+#define MEMCPY_HOST_TO_HOST 0
+
 enum SIMETRIAS
 {
     SIMETRIA_ERRONEA                    =  -1,
@@ -49,30 +51,41 @@ typedef struct VarPack
     double extr[4][3];
 } VarPack;
 
+enum TIPO_ENTRADA
+{
+    HOST = 0,
+    CUDA = 1
+};
+
 typedef struct EntradaCuerpo
 {
+    TIPO_ENTRADA tipoEntrada;
     int nexT;
     int nelT;
     double ET;
     double alT;
     double nuT;
     double GT;
-    double exT[5000][3];
-    int conT[5000][3];
-    double ndT[5000][3];
-    double locT[5000][9];
+    double ** exT;//[5000][3];
+    int ** conT;//[5000][3];
+    double ** ndT;//[5000][3];
+    double ** locT;//[5000][9];
 
     // Coeficientes
-    double * AE;
-    double * BE;
-    double * AT;
-    double * BT;
-    double * CTE;
-    double * DTE;
+    double ** AE;
+    double ** BE;
+    double ** AT;
+    double ** BT;
+    double ** CTE;
+    double ** DTE;
 
     VarPack varPack;
 } EntradaCuerpo;
 
+
+
+extern EntradaCuerpo entradaCuerpoA;
+extern EntradaCuerpo entradaCuerpoB;
 extern int enExcepcion;
 
 extern char titulo[80];// Título del problema

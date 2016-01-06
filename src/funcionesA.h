@@ -89,8 +89,8 @@ void SISTLOCAL();
 //********************************* NOTA ***************************************
 //*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
 //******************************************************************************
-
-void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
+__global__
+void COEFICIENTES(EntradaCuerpo* entradaCuerpo);
 
 //******************************************************************************
 //*                                                                            *
@@ -150,6 +150,6 @@ void CHETRAC();
 void CHEINTE();
 
 
-int ObtenerSimetria();
+int ObtenerSimetria(EntradaCuerpo* entradaCuerpo);
 #endif /* FUNCIONESA_H_ */
 

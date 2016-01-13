@@ -2,17 +2,13 @@
 
 int enExcepcion;
 
-EntradaCuerpo entradaCuerpoA;
-EntradaCuerpo entradaCuerpoB;
-
-
 char titulo[80];// Título del problema
 char nomArchSalTer[80];// Nombre del archivo de salida [térmico]
 char nomArchSalElas[80];// Nombre del archivo de salida [elástico
 
 int  nelA;// Número total de elementos. Sólido A
 int  nelB;// Número total de elementos. Sólido B
-//int  nelT;// Número total de elementos.
+int  nelT;// Número total de elementos.
 int  nelpA;// Número de elementos pasivos. Sólido A
 int  nelpB;// Número de elementos pasivos. Sólido B
 int  nelwA;// Número de elementos cargados. Sólido A
@@ -20,14 +16,14 @@ int  nelwB;// Número de elementos cargados. Sólido B
 int  nelpc;// Número de elementos en zona potencial de contacto
 int  nexA;// Número total de extremos. Sólido A
 int  nexB;// Número total de extremos. Sólido B
-//int  nexT;// Número total de extremos.
+int  nexT;// Número total de extremos.
 
 int  nel;// Auxiliar montaje cuerpo A-cuerpoB
 int  ngl;// Número total de grados de libertad del problema
 
 int  conA[MAX_EL][3];// Tabla de conectividades. Sólido A
 int  conB[MAX_EL][3];// Tabla de conectividades. Sólido B
-//int  conT[MAX_EL][3];// Tabla de conectividades.
+int  conT[MAX_EL][3];// Tabla de conectividades.
 
 int  codA[MAX_ND][2];// Códigos de carga. Sólido A
 int  codB[MAX_ND][2];// Códigos de carga. Sólido B
@@ -40,33 +36,33 @@ double  cc[MAX_EL];// Condiciones de contorno generales para el montaje del sist
 
 double  exA[MAX_EX][3];// Coordenadas de los extremos. Sólido A
 double  exB[MAX_EX][3];// Coordenadas de los extremos. Sólido B
-//double  exT[MAX_EX][3];// Coordenadas de los extremos.
+double  exT[MAX_EX][3];// Coordenadas de los extremos.
 
 double  ndA[MAX_ND][3];// Coordenadas de los nodos. Sólido A
 double  ndB[MAX_ND][3];// Coordenadas de los nodos. Sólido B
-//double  ndT[MAX_ND][3];// Coordenadas de los nodos.
+double  ndT[MAX_ND][3];// Coordenadas de los nodos.
 
 double  locA[MAX_ND][9];// Componentes del sistema local en los nodos. Sólido A
 double  locB[MAX_ND][9];// Componentes del sistema local en los nodos. Sólido B
-//double  locT[MAX_ND][9];// Componentes del sistema local en los nodos.
+double  locT[MAX_ND][9];// Componentes del sistema local en los nodos.
 
 
 double  gap[MAX_ND];// Gap en los pares de nodos en contacto
 
 double  EA;// Módulo de elasticidad. Sólido A
 double  EB;// Módulo de elasticidad. Sólido B
-//double  ET;// Módulo de elasticidad.
+double  ET;// Módulo de elasticidad.
 double  Emedia;// Factor de escalado = Módulo de elasticidad medio.
 
 double  nuA;// Módulo de Poisson. Sólido A
 double  nuB;// Módulo de Poisson. Sólido B
-//double  nuT;// Módulo de Poisson.
-//double  GT;// Módulo de elasticidad transversal.
+double  nuT;// Módulo de Poisson.
+double  GT;// Módulo de elasticidad transversal.
 
 double  tref;// Temperatura de referencia
 double  alA;// Coeficiente de dilatación lineal. Sólido A
 double  alB;// Coeficiente de dilatación lineal. Sólido B
-//double  alT;// Coeficiente de dilatación lineal.
+double  alT;// Coeficiente de dilatación lineal.
 double  lamA;// Conductividad térmica del sólido A
 double  lamB;// Conductividad térmica del sólido B
 double  diA;// Distorsionabilidad del sólido A
@@ -90,40 +86,36 @@ double  hflu;// convección del gas en despegue
 double  tflu;// temperatura del gas despegue convección forzada
 double  cf;// Coeficiente de fricción
 
-/*
-__device__ int  tpproE;// Flag de tipo de problema elastico
-__device__ int  tpproT;// Flag de tipo de problema termico
-__device__ int  tpproTE;// Flag de tipo de problema termoelastico
-__device__ int  tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
-__device__ int  tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
-__device__ int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
-__device__ int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
-__device__ int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
+int  simXY;// Flag de simetría respecto del plano xOy
+int  simXZ;// Flag de simetría respecto del plano xOz
+int  simYZ;// Flag de simetría respecto del plano yOz
+int  tpproE;// Flag de tipo de problema elastico
+int  tpproT;// Flag de tipo de problema termico
+int  tpproTE;// Flag de tipo de problema termoelastico
+int  tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+int  tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
 
-*/
-/*
-__device__
+
+
+
 double  AE[3][3];// Coeficientes A elasticos
-__device__
 double  BE[3][3];// Coeficientes B elasticos
-__device__
 double  AT;// Coeficiente A termico
-__device__
 double  BT;// Coeficiente B termico
-__device__
 double  CTE[3];// Coeficientes C termoelasticos
-__device__
 double  DTTE[3];// Coeficientes D termoelasticos
-__device__
 double  DTE[3][3];// Coeficientes D termoelasticos
-*/
 
-/*double** AE_A;double** AE_B;
+
+double** AE_A;double** AE_B;
 double** BE_A;double** BE_B;
 double** AT_A;double** AT_B;
 double** BT_A;double** BT_B;
 double** CTE_A;double** CTE_B;
-double** DTE_A;double** DTE_B;*/
+double** DTE_A;double** DTE_B;
 
 
 double  a[3*MAX_EL][3*MAX_EL];// Matriz del sistema de ecuaciones
@@ -164,13 +156,13 @@ int  nmiter;// Número máximo de iteraciones
 int  iter;// Número total de iteraciones
 int  ifla;// Chivato para iteraciones
 double  rsq;
-/*
+
 double  cte1;// Constante en la integracion elastica
 double  cte2;// Constante en la integracion elastica
 double  cte3;// Constante en la integracion elastica
 double  cte4;// Constante en la integracion termica
 double  cte5;// Constante en la integracion termoelastica
-*/
+
 FILE*   in1;// Fichero de entrada
 
 int  out1;// Fichero de salida

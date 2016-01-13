@@ -53,9 +53,7 @@ int main(void)
 
     //* Abre fichero
     in1 = fopen(FICHERO_ENTRADA_COMPLETA, "r");
-#ifdef DEBUG
-    printf("[solidos.c] in1 handler: %p\n", &in1);
-#endif    
+
     //* Lee el titulo del problema a analizar
     leeCadena(in1, titulo);
 
@@ -66,12 +64,7 @@ int main(void)
     //* Lee el tipo de cargas especiales
     leeEntero(in1,&tpcarPP);leeEntero(in1,&tpcarFC);leeEntero(in1,&tpcarFP);leeEntero(in1,&tpcarFL);leeEntero(in1,&tpcarFD);leeLinea(in1);
     //* Lee los flags de simetria
-    leeEntero(in1,&entradaCuerpoA.simXY);leeEntero(in1,&entradaCuerpoA.simXZ);leeEntero(in1,&entradaCuerpoA.simYZ);leeLinea(in1);
-
-    entradaCuerpoB.simXY = entradaCuerpoA.simXY;
-    entradaCuerpoB.simXZ = entradaCuerpoA.simXZ;
-    entradaCuerpoB.simYZ = entradaCuerpoA.simYZ;
-
+    leeEntero(in1,&simXY);leeEntero(in1,&simXZ);leeEntero(in1,&simYZ);leeLinea(in1);
 
     //* Lee las caracteristicas elasticas
     leeDouble(in1,&EA);leeDouble(in1,&nuA);leeDouble(in1,&alA);leeDouble(in1,&EB);leeDouble(in1,&nuB);leeDouble(in1,&alB);leeLinea(in1);
@@ -163,7 +156,7 @@ int main(void)
     //* Final del prep
     printf("Final del proceso. Saliendo de PREPROCESADOR\n");
     tfinal = clock()/CLOCKS_PER_SEC;
-    printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
+    printf("\tTiempo de proceso = %f segundos\n",tfinal-tinicio);
     //* Formatos
 
     //* Comienzo de solu...
@@ -294,14 +287,12 @@ int main(void)
     printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
 
 
-    finalizar(&entradaCuerpoA);
-    finalizar(&entradaCuerpoB);
-    /*free(AE_A);free(AE_B);
+    free(AE_A);free(AE_B);
     free(BE_A);free(BE_B);
     free(AT_A);free(AT_B);
     free(BT_A);free(BT_B);
     free(CTE_A);free(CTE_B);
-    free(DTE_A);free(DTE_B);*/
+    free(DTE_A);free(DTE_B);
 
     return 0;
 }

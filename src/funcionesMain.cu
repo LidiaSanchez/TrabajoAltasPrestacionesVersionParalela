@@ -289,120 +289,139 @@ void INTEGRAL()
     
     printf("==================== Entrando en INTEGRAL ====================\n");
     //* Lee los datos del problema
-
-    entradaCuerpoA.nexT = nexA;
-    entradaCuerpoA.nelT = nelA;
-    entradaCuerpoA.ET = EA;
-    entradaCuerpoA.alT = alA;
-    entradaCuerpoA.nuT = nuA;
-    entradaCuerpoA.GT = EA/(2.0*(1.0+nuA));
-
-    EntradaCuerpo entradaCuerpoACuda = entradaCuerpoA;
-
-    inicializar(&entradaCuerpoA, HOST);
-
-    printf("[CUERPO A] EntradaCuerpoA de host inicializado.\n");
-
-    inicializar(&entradaCuerpoACuda, CUDA);
-
-    printf("[CUERPO A] EntradaCuerpoA de cuda inicializado.\n");
-
-
-    copiarMatriz((void**)entradaCuerpoA.exT, (void**)exA, sizeof(double), nexA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.conT, (void**)conA, sizeof(double), nelA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.ndT, (void**)ndA, sizeof(double), nelA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.locT, (void**)locA, sizeof(double), nelA, 9, MEMCPY_HOST_TO_HOST);
-
-#ifdef DEBUG_CUDA
-    printf("[CUERPO A] Matrices copiadas de host a host.\n");
-#endif DEBUG_CUDA
-
-
-    copiarMatriz((void**)entradaCuerpoACuda.exT, (void**)exA, sizeof(double), nexA, 3, cudaMemcpyHostToDevice);
-    copiarMatriz((void**)entradaCuerpoACuda.conT, (void**)conA, sizeof(double), nelA, 3, cudaMemcpyHostToDevice);
-    copiarMatriz((void**)entradaCuerpoACuda.ndT, (void**)ndA, sizeof(double), nelA, 3, cudaMemcpyHostToDevice);
-    copiarMatriz((void**)entradaCuerpoACuda.locT, (void**)locA, sizeof(double), nelA, 9, cudaMemcpyHostToDevice);
-
-#ifdef DEBUG_CUDA
-    printf("[CUERPO A] Matrices copiadas de host a dispositivo.\n");
-#endif DEBUG_CUDA
-
-
-    EntradaCuerpo * entradaCuerpoACudaDispositivo;
-    cudaMalloc(&entradaCuerpoACudaDispositivo, sizeof(EntradaCuerpo));
-    cudaMemcpy(entradaCuerpoACudaDispositivo, entradaCuerpoACuda, sizeof(EntradaCuerpo), cudaMemcpyHostToDevice);
-    printf("[CUERPO A] Entrada de cuerpo A volcada a dispositivo.\n");
-
+    
+    //* Asigna datos de entrada del cuerpo "A"
+    nexT=nexA;
+    nelT=nelA;
+    ET=EA;
+    alT=alA;
+    nuT=nuA;
+    GT=ET/(2.0*(1.0+nuT));
+    for( ex=1; ex<=nexA; ex++)      
+    {
+        for( j=1; j<=3; j++)        
+        {
+            exT[ex-1][j-1]=exA[ex-1][j-1];
+        }
+    }
+    for( el=1; el<=nelA; el++)      
+    {
+        for( j=1; j<=3; j++)        
+        {
+            conT[el-1][j-1]=conA[el-1][j-1];
+            ndT[el-1][j-1]=ndA[el-1][j-1];
+        }
+        for( j=1; j<=9; j++)        
+        {
+            locT[el-1][j-1]=locA[el-1][j-1];
+        }
+    }
     //* Abre ficheros
     
     //* Calcula coeficientes del cuerpo "A"
     printf("++++++++ Calcula coeficientes del cuerpo \"A\" ++++++++\n");
     tiniA = clock()/CLOCKS_PER_SEC;
-    printf("[%.3fs] Inicio calculo coeficientes.\n",tiniA);
-
-    COEFICIENTES<<<1, THREADS_PER_BLOCK>>>(entradaCuerpoACudaDispositivo);
-
-    cudaMemcpy(entradaCuerpoACuda, entradaCuerpoACudaDispositivo, sizeof(EntradaCuerpo), cudaMemcpyHostToDevice);
-
-    if(entradaCuerpoACuda->enExcepcion==1)
+    printf("[%.3f] Inicio calculo coeficientes.\n",tiniA);
+    AE_A = (double**)malloc((3*nelT)*sizeof(double*));int iTemp;for(iTemp=0;iTemp<3*nelT;iTemp++)
     {
-        printf("se produjo excepción durante el calculo de los coeficientes del cuerpo A.\n");
-        return;
+        AE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
     }
-
-    copiarMatriz((void**)exA, (void**)entradaCuerpoACuda.exT, sizeof(double), nexA, 3, cudaMemcpyDeviceToHost);
-    copiarMatriz((void**)conA, (void**)entradaCuerpoACuda.conT, sizeof(double), nelA, 3, cudaMemcpyDeviceToHost);
-    copiarMatriz((void**)ndA, (void**)entradaCuerpoACuda.ndT, sizeof(double), nelA, 3, cudaMemcpyDeviceToHost);
-    copiarMatriz((void**)locA, (void**)entradaCuerpoACuda.locT, sizeof(double), nelA, 9, cudaMemcpyDeviceToHost);
-
-    printf("[CUERPO A] Matrices copiadas de dispositivo a host.\n");
-
-
-    copiarMatriz((void**)entradaCuerpoA.exT, (void**)exA, sizeof(double), nexA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.conT, (void**)conA, sizeof(double), nelA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.ndT, (void**)ndA, sizeof(double), nelA, 3, MEMCPY_HOST_TO_HOST);
-    copiarMatriz((void**)entradaCuerpoA.locT, (void**)locA, sizeof(double), nelA, 9, MEMCPY_HOST_TO_HOST);
-
-#ifdef DEBUG_CUDA
-    printf("[CUERPO A] Matrices volcadas en estructura de cuerpo A.\n");
-#endif DEBUG_CUDA
-
-
+    BE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        BE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
+    }
+    AT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    {
+        AT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    BT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    {
+        BT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    CTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        CTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    DTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        DTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    COEFICIENTES(AE_A,BE_A,AT_A,BT_A,CTE_A,DTE_A);if(enExcepcion==1)return;
+    
     tfinA = clock()/CLOCKS_PER_SEC;
-    printf("[%.3fs] Final calculo coeficientes.\n",tfinA);
-    printf("\t** Tiempo Total= %f segundos\n",tfinA-tiniA);
-
-
-
-    /*entradaCuerpoB.nexT = nexB;
-    entradaCuerpoB.nelT = nelB;
-    entradaCuerpoB.ET = EB;
-    entradaCuerpoB.alT = alB;
-    entradaCuerpoB.nuT = nuB;
-    entradaCuerpoB.GT = EB/(2.0*(1.0+nuB));
-
-    inicializar(&entradaCuerpoB, CUDA);
-    copiarMatriz(entradaCuerpoB.exT, exB, sizeof(double), nexB, 3, cudaMemcpyHostToDevice);
-    copiarMatriz(entradaCuerpoB.conT, conB, sizeof(double), nelB, 3, cudaMemcpyHostToDevice);
-    copiarMatriz(entradaCuerpoB.ndT, ndB, sizeof(double), nelB, 3, cudaMemcpyHostToDevice);
-    copiarMatriz(entradaCuerpoB.locT, locB, sizeof(double), locB, 9, cudaMemcpyHostToDevice);
-
+    printf("[%.3f] Final calculo coeficientes.\n",tfinA);
+    printf("\tTiempo Total= %f segundos\n",tfinA-tiniA);
+    
+    //* Cierra ficheros
+    
+    //* Asigna datos de entrada del cuerpo "B"
+    nexT=nexB;
+    nelT=nelB;
+    ET=EB;
+    alT=alB;
+    nuT=nuB;
+    GT=ET/(2.0*(1.0+nuT));
+    for( ex=1; ex<=nexB; ex++)      
+    {
+        for( j=1; j<=3; j++)        
+        {
+            exT[ex-1][j-1]=exB[ex-1][j-1];
+        }
+    }
+    for( el=1; el<=nelB; el++)      
+    {
+        for( j=1; j<=3; j++)        
+        {
+            conT[el-1][j-1]=conB[el-1][j-1];
+            ndT[el-1][j-1]=ndB[el-1][j-1];
+        }
+        for( j=1; j<=9; j++)        
+        {
+            locT[el-1][j-1]=locB[el-1][j-1];
+        }
+    }
+    //* Abre ficheros
+    
     //* Calcula coeficientes del cuerpo "B"
     printf("+++++++ Calcula coeficientes del cuerpo \"B\" +++++++\n");
     tiniB = clock()/CLOCKS_PER_SEC;
-    printf("[%.3fs] Inicio calculo coeficientes.\n",tiniB);
-
+    printf("[%.3f] Inicio calculo coeficientes.\n",tiniB);
+    AE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        AE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
+    }
+    BE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        BE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
+    }
+    AT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    {
+        AT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    BT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
+    {
+        BT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    CTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        CTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
+    DTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
+    {
+        DTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
+    }
     COEFICIENTES(AE_B,BE_B,AT_B,BT_B,CTE_B,DTE_B);if(enExcepcion==1)return;
-
-
+    
+    //* Cierra ficheros
+    
     //* Final del programa
     
     tfinB = clock()/CLOCKS_PER_SEC;
-    printf("[%.3fs] Final calculo coeficientes.\n",tfinB);
-    printf("\t** Tiempo Total= %f segundos\n",tfinB-tiniB);
+    printf("[%.3f] Final calculo coeficientes.\n",tfinB);
+    printf("\tTiempo Total= %f segundos\n",tfinB-tiniB);
     
     printf("==================== Saliendo de INTEGRAL ===================\n");
-    printf("TIEMPOOOOOOOOO: %fs\n",(tfinA-tiniA)+(tfinB-tiniB));*/
+    printf("TIEMPOOOOOOOOO: %f\n",(tfinA-tiniA)+(tfinB-tiniB));
 }
 
 
@@ -911,162 +930,4 @@ void SALIDA_SOLU()
     
     //* Formatos
     return;
-}
-
-
-void inicializar(EntradaCuerpo* entradaCuerpo, TIPO_ENTRADA tipoEntrada)
-{
-    entradaCuerpo->tipoEntrada = tipoEntrada;
-
-    entradaCuerpo->exT  = (double **)generarMatriz(sizeof(double), 5000, 3, tipoEntrada);
-    entradaCuerpo->conT = (int **)generarMatriz(sizeof(int), 5000, 3, tipoEntrada);
-    entradaCuerpo->ndT  = (double **)generarMatriz(sizeof(double), 5000, 3, tipoEntrada);
-    entradaCuerpo->locT = (double **)generarMatriz(sizeof(double), 5000, 9, tipoEntrada);
-
-    entradaCuerpo->AE   = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT * 3, entradaCuerpo->nelT * 3, tipoEntrada);
-    entradaCuerpo->BE   = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT * 3, entradaCuerpo->nelT * 3, tipoEntrada);
-    entradaCuerpo->AT   = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT, entradaCuerpo->nelT, tipoEntrada);
-    entradaCuerpo->BT   = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT, entradaCuerpo->nelT, tipoEntrada);
-    entradaCuerpo->CTE  = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT * 3, entradaCuerpo->nelT, tipoEntrada);
-    entradaCuerpo->DTE  = (double **)generarMatriz(sizeof(double), entradaCuerpo->nelT * 3, entradaCuerpo->nelT, tipoEntrada);
-}
-
-void** generarMatriz(int tamanioElemento, int filas, int columnas, TIPO_ENTRADA tipoEntrada)
-{
-    void** variable;
-
-    switch (tipoEntrada)
-    {
-        case HOST:
-            variable = (void **)alloc2DOnHost(filas, columnas, tamanioElemento);
-            break;
-
-        case CUDA:
-            variable = (void **)alloc2DOnDevice(filas, columnas, tamanioElemento);
-            break;
-    }
-
-    return variable;
-}
-
-/**
- * Allocates a 2 dimensional array.
- *
- * Its elements are initialized to 0 by default.
- * It can be freed with a single free() call.
- * It is possible to access this array as array[n][m] in the code.
- * If you want a deep explanation, please, email me at
- * ipazce00@estudiantes.unileon.es
- *
- * @param rows  number of rows.
- * @param columns number of columns.
- * @param sizeOfElement size in bytes of each element.
- *
- * @return a 2 dimensional array.
- */
-void** alloc2DOnHost(int rows, int columns, int sizeOfElement)
-{
-    int header = rows * sizeof(void*);
-    int body = rows * columns * sizeOfElement;
-
-    void** rowptr = (void**)malloc(header + body);
-    char* values = (char*)(rowptr + rows);
-
-    for (int i=0; i< rows*columns * sizeOfElement; i++)
-        values[i] = 0;
-
-    for (int i=0; i<rows; i++)
-        rowptr[i] = (void*) &values[i*columns*sizeOfElement];
-
-    return rowptr;
-}
-
-__global__ void __organize2DMatrix(void** matrix, int rows, int cols, int sizeOfElement)
-{
-    char* values = (char*)(matrix + rows);
-
-#ifdef DEBUG_CUDA
-    printf("[__organize2DMatrix] organize started. Loop for %d elements.\n", rows*cols * sizeOfElement);
-#endif
-/*    for (int i=0; i< rows*cols * sizeOfElement; i++)
-        values[i] = 0;*/
-
-    for (int i=0; i<rows; i++)
-        matrix[i] = (void*) &values[i*cols*sizeOfElement];
-
-#ifdef DEBUG_CUDA
-    printf("[__organize2DMatrix] organize finished. Waiting?.\n");
-#endif
-}
-
-void ** alloc2DOnDevice(int rows, int cols, int sizeOfElement)
-{
-    int header = rows * sizeof(void*);
-    int body = rows * cols * sizeOfElement;
-
-    void** rowptr;
-#ifdef DEBUG_CUDA
-    printf("[alloc2DOnDevice] before cuda alloc.\n");
-#endif
-    cudaMalloc(&rowptr, header+body);
-#ifdef DEBUG_CUDA
-    printf("[alloc2DOnDevice] after cuda alloc.\n");
-#endif
-
-    __organize2DMatrix<<<1,1>>>(rowptr, rows, cols, sizeOfElement);
-
-    cudaDeviceSynchronize();
-
-    return rowptr;
-}
-
-
-
-void liberarMatriz(void** matriz, TIPO_ENTRADA tipoEntrada)
-{
-    switch (tipoEntrada)
-    {
-        case HOST:
-            free(matriz);
-            break;
-
-        case CUDA:
-            cudaFree(matriz);
-            break;
-    }
-}
-
-void finalizar(EntradaCuerpo* entradaCuerpo)
-{
-    liberarMatriz((void**)entradaCuerpo->exT, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->conT, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->ndT, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->locT, entradaCuerpo->tipoEntrada);
-
-    liberarMatriz((void**)entradaCuerpo->AE, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->BE, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->AT, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->BT, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->CTE, entradaCuerpo->tipoEntrada);
-    liberarMatriz((void**)entradaCuerpo->DTE, entradaCuerpo->tipoEntrada);
-}
-
-void copiarMatriz(void** matrizDestino, void** matrizOrigen, int tamanioElemento, int filas, int columnas, int direccion)
-{
-
-    switch (direccion)
-    {
-        case MEMCPY_HOST_TO_HOST:
-            memcpy(matrizDestino+filas, matrizOrigen+filas,
-                   filas*columnas*sizeof(tamanioElemento) - sizeof(void*)*filas);
-            break;
-        case cudaMemcpyDeviceToHost:
-            cudaMemcpy(matrizDestino+filas, matrizOrigen+filas,
-                       filas*columnas*sizeof(tamanioElemento) - sizeof(void*)*filas, cudaMemcpyDeviceToHost);
-            break;
-        case cudaMemcpyHostToDevice:
-            cudaMemcpy(matrizDestino+filas, matrizOrigen+filas,
-                       filas*columnas*sizeof(tamanioElemento) - sizeof(void*)*filas, cudaMemcpyHostToDevice);
-            break;
-    }
 }

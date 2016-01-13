@@ -18,6 +18,7 @@
 #define MAX_EL 5000     // Máximo número de elementos
 #define MAX_SUB 5000    // Máximo número de subelementos
 
+#define MEMCPY_HOST_TO_HOST 0
 #define BLOCKS_PER_PROCESS 2
 #define THREADS_PER_BLOCK 4
 
@@ -25,10 +26,15 @@
 #define FICHERO_TERM "datos/term.dat"
 #define FICHERO_ELAST "datos/elast.dat"
 
+
 //#define DEBUG 0
 //#define DEBUG_TIMES
-#define DEBUG_CUDA
-#define MEMCPY_HOST_TO_HOST 0
+
+enum CONTEXTO
+{
+    HOST = 0,
+    CUDA = 1
+};
 
 enum SIMETRIAS
 {
@@ -51,25 +57,20 @@ typedef struct VarPack
     double extr[4][3];
 } VarPack;
 
-enum TIPO_ENTRADA
-{
-    HOST = 0,
-    CUDA = 1
-};
-
 typedef struct EntradaCuerpo
 {
-    TIPO_ENTRADA tipoEntrada;
+    CONTEXTO contexto;
+
     int nexT;
     int nelT;
     double ET;
     double alT;
     double nuT;
     double GT;
-    double ** exT;//[5000][3];
-    int ** conT;//[5000][3];
-    double ** ndT;//[5000][3];
-    double ** locT;//[5000][9];
+    double ** exT;
+    int    ** conT;
+    double ** ndT;
+    double ** locT;
 
     // Coeficientes
     double ** AE;
@@ -79,29 +80,9 @@ typedef struct EntradaCuerpo
     double ** CTE;
     double ** DTE;
 
-    int  simXY;// Flag de simetría respecto del plano xOy
-    int  simXZ;// Flag de simetría respecto del plano xOz
-    int  simYZ;// Flag de simetría respecto del plano yOz
-
-    int enExcepcion;
-
-
-    int  tpproE;// Flag de tipo de problema elastico
-    int  tpproT;// Flag de tipo de problema termico
-    int  tpproTE;// Flag de tipo de problema termoelastico
-    int  tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
-    int  tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
-    int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
-    int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
-    int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
-
     VarPack varPack;
 } EntradaCuerpo;
 
-
-
-extern EntradaCuerpo entradaCuerpoA;
-extern EntradaCuerpo entradaCuerpoB;
 extern int enExcepcion;
 
 extern char titulo[80];// Título del problema
@@ -188,30 +169,37 @@ extern double  hflu;// convección del gas en despegue
 extern double  tflu;// temperatura del gas despegue convección forzada
 extern double  cf;// Coeficiente de fricción
 
-/*extern int  simXY;// Flag de simetría respecto del plano xOy
+extern int  simXY;// Flag de simetría respecto del plano xOy
 extern int  simXZ;// Flag de simetría respecto del plano xOz
-extern int  simYZ;// Flag de simetría respecto del plano yOz*/
+extern int  simYZ;// Flag de simetría respecto del plano yOz
+extern int  tpproE;// Flag de tipo de problema elastico
+extern int  tpproT;// Flag de tipo de problema termico
+extern int  tpproTE;// Flag de tipo de problema termoelastico
+extern int  tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+extern int  tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+extern int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+extern int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+extern int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
 
 
 
 
+extern double  AE[3][3];// Coeficientes A elasticos
+extern double  BE[3][3];// Coeficientes B elasticos
+extern double  AT;// Coeficiente A termico
+extern double  BT;// Coeficiente B termico
+extern double  CTE[3];// Coeficientes C termoelasticos
+extern double  DTTE[3];// Coeficientes D termoelasticos
+extern double  DTE[3][3];// Coeficientes D termoelasticos
 
-extern __device__ double  AE[3][3];// Coeficientes A elasticos
-extern __device__ double  BE[3][3];// Coeficientes B elasticos
-extern __device__ double  AT;// Coeficiente A termico
-extern __device__ double  BT;// Coeficiente B termico
-extern __device__ double  CTE[3];// Coeficientes C termoelasticos
-extern __device__ double  DTTE[3];// Coeficientes D termoelasticos
-extern __device__ double  DTE[3][3];// Coeficientes D termoelasticos
 
-
-/*extern double** AE_A;extern double** AE_B;
+extern double** AE_A;extern double** AE_B;
 extern double** BE_A;extern double** BE_B;
 extern double** AT_A;extern double** AT_B;
 extern double** BT_A;extern double** BT_B;
 extern double** CTE_A;extern double** CTE_B;
 extern double** DTE_A;extern double** DTE_B;
-*/
+
 
 extern double  a[3*MAX_EL][3*MAX_EL];// Matriz del sistema de ecuaciones
 extern double  b[3*MAX_EL];// Términos independientes del sistema de ecuaciones
@@ -252,11 +240,11 @@ extern int  iter;// Número total de iteraciones
 extern int  ifla;// Chivato para iteraciones
 extern double  rsq;
 
-extern __device__ double  cte1;// Constante en la integracion elastica
-extern __device__ double  cte2;// Constante en la integracion elastica
-extern __device__ double  cte3;// Constante en la integracion elastica
-extern __device__ double  cte4;// Constante en la integracion termica
-extern __device__ double  cte5;// Constante en la integracion termoelastica
+extern double  cte1;// Constante en la integracion elastica
+extern double  cte2;// Constante en la integracion elastica
+extern double  cte3;// Constante en la integracion elastica
+extern double  cte4;// Constante en la integracion termica
+extern double  cte5;// Constante en la integracion termoelastica
 
 extern FILE*   in1;// Fichero de entrada
 

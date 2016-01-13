@@ -7,7 +7,6 @@
 #include "funcionesD.h"
 #include <time.h>
 #include <stdlib.h>
-#include <string.h>
 
 #ifndef FUNCIONESMAIN_H_
 #define FUNCIONESMAIN_H_
@@ -131,48 +130,6 @@ void COMPRESIS();
 //************************************************************************
 void SALIDA_SOLU();
 
-void inicializar(EntradaCuerpo* entradaCuerpo, TIPO_ENTRADA tipoEntrada);
 
-void** generarMatriz(int tamanioElemento, int filas, int columnas, TIPO_ENTRADA tipoEntrada);
-void copiarMatriz(void** matrizDestino, void** matrizOrigen, int tamanioElemento, int filas, int columnas, int direccion);
-void liberarMatriz(void** matriz, TIPO_ENTRADA tipoEntrada);
-
-/**
- * Allocates a 2 dimensional array at the host.
- *
- * Its elements are initialized to 0 by default.
- * It can be freed with a single free() call.
- * It is possible to access this array as array[n][m] in the code.
- * If you want a deep explanation, please, email me at
- * ipazce00@estudiantes.unileon.es
- *
- * @param rows  number of rows.
- * @param columns number of columns.
- * @param sizeOfElement size in bytes of each element.
- *
- * @return a 2 dimensional array.
- */
-void** alloc2DOnHost(int rows, int cols, int sizeOfElement);
-
-/**
- * Allocates a 2 dimensional array at the device.
- *
- * Its elements are initialized to 0 by default.
- * It can be freed with a single free() call.
- * It is possible to access this array as array[n][m] in the device code.
- * If you want a deep explanation, please, email me at
- * ipazce00@estudiantes.unileon.es
- *
- * @param rows  number of rows.
- * @param columns number of columns.
- * @param sizeOfElement size in bytes of each element.
- *
- * @return a 2 dimensional array, only accessible in the device.
- */
-void ** alloc2DOnDevice(int rows, int cols, int sizeOfElement);
-
-__global__ void __organize2DMatrix(void** matrix, int rows, int cols, int sizeOfElement);
-
-void finalizar(EntradaCuerpo* entradaCuerpo);
 #endif /* FUNCIONESMAIN_H_ */
 

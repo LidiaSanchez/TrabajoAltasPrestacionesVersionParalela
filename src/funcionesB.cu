@@ -58,7 +58,7 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod)
 //*                                                                            *
 //******************************************************************************
 
-void INTEGRA((EntradaCuerpo* entradaCuerpo, VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
+void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
 {
     //* Declaracion de variables
 

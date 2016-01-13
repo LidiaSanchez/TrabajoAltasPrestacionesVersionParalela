@@ -90,7 +90,7 @@ void SISTLOCAL();
 //*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
 //******************************************************************************
 
-void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
+void COEFICIENTES(EntradaCuerpo* entradaCuerpo);
 
 //******************************************************************************
 //*                                                                            *

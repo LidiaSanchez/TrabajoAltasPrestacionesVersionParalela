@@ -58,9 +58,43 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod)
 //*                                                                            *
 //******************************************************************************
 
-void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
+void INTEGRA(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double * CT,double DT[3][3])
 {
     //* Declaracion de variables
+
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+    double ** AE = entradaCuerpo->AE;
+    double ** BE = entradaCuerpo->BE;
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+    double ** DTE = entradaCuerpo->DTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
     /*double AET[3][3];*	//*double BET[3][3];*/;      //Coeficientes de integracion elasticos
     double ATT=*punteroA_ATT;double BTT=*punteroA_BTT;;	//Coeficientes de integracion termicos
@@ -82,8 +116,8 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
     //* Asigna cuarto extremo y calcula baricentro del elemento
     for( i=1; i<=3; i++)      
     {
-        varPack->extr[4-1][i-1]=varPack->extr[1-1][i-1];
-        bar[i-1]=(varPack->extr[1-1][i-1]+varPack->extr[2-1][i-1]+varPack->extr[3-1][i-1])/3.0;
+        extr[4-1][i-1]=extr[1-1][i-1];
+        bar[i-1]=(extr[1-1][i-1]+extr[2-1][i-1]+extr[3-1][i-1])/3.0;
     }
     //* Calcula los lados de los elementos
     for( i=1; i<=3; i++)        
@@ -91,7 +125,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
         lado[i-1]=0.0;
         for( j=1; j<=3; j++)          
         {
-            lado[i-1]=lado[i-1]+pow((varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1]),2);
+            lado[i-1]=lado[i-1]+pow((extr[i+1-1][j-1]-extr[i-1][j-1]),2);
         }
         lado[i-1]=sqrt(lado[i-1]);
     }
@@ -99,7 +133,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
     {
         for( j=1; j<=3; j++)        
         {
-            lad[i-1][j-1]= (varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1])/lado[i-1];
+            lad[i-1][j-1]= (extr[i+1-1][j-1]-extr[i-1][j-1])/lado[i-1];
         }
     }
     //* Calcula el vector normal
@@ -108,12 +142,12 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
     n[3-1]=-lad[1-1][1-1]*lad[3-1][2-1]+lad[1-1][2-1]*lad[3-1][1-1];
 
     //* Decide el tipo de integracion
-    if(!varPack->intenum)
+    if(!intenum)
     {
 #ifdef DEBUG_TIMES
         printf("[INTEGRA()] Analitica() called.\n");
 #endif
-        ANALITICA(varPack, AET,BET,&ATT,&BTT,CT,DT,n,bar);if(enExcepcion==1)return;
+        ANALITICA(entradaCuerpo, AET,BET,&ATT,&BTT,CT,DT,n,bar);if(enExcepcion==1)return;
 #ifdef DEBUG_TIMES
         printf("[INTEGRA()] Analitica() returned.\n");
 #endif
@@ -125,7 +159,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
         distancia=0.0;
         for( i=1; i<=3; i++)          
         {
-            dis[i-1]=(bar[i-1]-varPack->ndCol[i-1]);
+            dis[i-1]=(bar[i-1]-ndCol[i-1]);
             dist=dist+pow(dis[i-1],2);
             distancia=distancia+dis[i-1]*n[i-1];
         }
@@ -141,7 +175,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
             {
                 for( j=1; j<=3; j++)              
                 {
-                    extrs[i-1][j-1]=varPack->extr[i-1][j-1];
+                    extrs[i-1][j-1]=extr[i-1][j-1];
                 }
             }
 #ifdef DEBUG_TIMES
@@ -171,7 +205,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
                 for( j=1; j<=3; j++)            
                 {
                     bar[j-1]=(subextr[i-1][1-1][j-1]+subextr[i-1][2-1][j-1]+subextr[i-1][3-1][j-1])/3.0;
-                    dist=dist+pow((varPack->ndCol[j-1]-bar[j-1]),2);
+                    dist=dist+pow((ndCol[j-1]-bar[j-1]),2);
                     lado[j-1]=0.0;
                     for( m=1; m<=3; m++)              
                     {
@@ -246,13 +280,13 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
                 {
                     for( m=1; m<=3; m++)                
                     {
-                        varPack->extr[j-1][m-1]=subextr[i-1][j-1][m-1];
+                        extr[j-1][m-1]=subextr[i-1][j-1][m-1];
                     }
                 }
 #ifdef DEBUG_TIMES
                 printf("[INTEGRA()] Numerica() called.\n");
 #endif
-                NUMERICA(varPack, AEP,BEP,&ATP,&BTP,CP,DP,n,&distancia);if(enExcepcion==1)return;
+                NUMERICA(entradaCuerpo, AEP,BEP,&ATP,&BTP,(double*)CP,DP,(double*)n,&distancia);if(enExcepcion==1)return;
 #ifdef DEBUG_TIMES
                 printf("[INTEGRA()] Numerica() returned.\n");
 #endif
@@ -290,7 +324,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
             //* No hay que subdividir
             //write(*,*) '  no subdivision'
             //write(*,*) '   NUMÉRICA'
-            NUMERICA(varPack, AET,BET,&ATT,&BTT,CT,DT,n,&distancia);if(enExcepcion==1)return;
+            NUMERICA(entradaCuerpo, AET,BET,&ATT,&BTT,CT,DT,(double*)n,&distancia);if(enExcepcion==1)return;
         }
     }
     *punteroA_ATT = ATT; *punteroA_BTT = BTT; return;
@@ -305,10 +339,57 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
 //*                                                                            *
 //******************************************************************************
 
-void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el)
+void TRANSFORMA(EntradaCuerpo* entradaCuerpo, double AETR[3][3],double BETR[3][3], int* punteroA_el)
 {
     //* Declaracion de variables
 
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+
+    double AE[3][3];
+    double BE[3][3];
+    double DTE[3][3];
+    for (int i=0; i< 3; i++)
+        for(int j=0; j<3; j++)
+        {
+            AE[i][j] = entradaCuerpo->AE[i][j];
+            BE[i][j] = entradaCuerpo->BE[i][j];
+            DTE[i][j] = entradaCuerpo->DTE[i][j];
+        }
+
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
     int el=*punteroA_el;;	//Elemento sobre el que se ha integrado
     int  i,j;	//Auxiliares
@@ -356,10 +437,57 @@ void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el)
 //*                                                                            *
 //******************************************************************************
 
-void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T)
+void ALMACENA(int* punteroA_el,int* punteroA_nd, EntradaCuerpo* entradaCuerpo, double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T)
 {
     //* Declaracion de variables
 
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    /*double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;*/
+
+
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+
+    double AE[3][3];
+    double BE[3][3];
+    double DTE[3][3];
+    for (int i=0; i< 3; i++)
+        for(int j=0; j<3; j++)
+        {
+            AE[i][j] = entradaCuerpo->AE[i][j];
+            BE[i][j] = entradaCuerpo->BE[i][j];
+            DTE[i][j] = entradaCuerpo->DTE[i][j];
+        }
+
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
     int el=*punteroA_el;int nd=*punteroA_nd;;	//Elemento sobre el que se ha integrado y nodo
     int  i,j;	//Auxiliares

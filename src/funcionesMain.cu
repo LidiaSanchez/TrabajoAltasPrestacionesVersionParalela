@@ -286,67 +286,112 @@ void INTEGRAL()
     out11=81;
     out13=83;
     out14=84;
-    
+
+    // Asignamos valores mínimos del cuerpo A para poder inicializarlo
+    cuerpoA[HOST].nexT = nexA;
+    cuerpoA[HOST].nelT = nelA;
+    cuerpoA[HOST].ET = EA;
+    cuerpoA[HOST].alT = alA;
+    cuerpoA[HOST].nuT = nuA;
+    cuerpoA[HOST].GT = EA/(2.0*(1.0+nuA));
+
+    cuerpoA[HOST].AT = AT;
+    cuerpoA[HOST].BT = BT;
+
+    cuerpoA[CUDA] = cuerpoA[HOST];
+
+
+    // Asignamos valores mínimos del cuerpo B para poder inicializarlo
+    cuerpoB[HOST].nexT = nexB;
+    cuerpoB[HOST].nelT = nelB;
+    cuerpoB[HOST].ET = EB;
+    cuerpoB[HOST].alT = alB;
+    cuerpoB[HOST].nuT = nuB;
+    cuerpoB[HOST].GT = EB/(2.0*(1.0+nuB));
+
+    cuerpoB[HOST].AT = AT;
+    cuerpoB[HOST].BT = BT;
+
+    cuerpoB[CUDA] = cuerpoB[HOST];
+
+    // Inicializamos las estructuras de entrada en cada contexto
+    printf("Reservando memoria para estructuras de entrada de cuerpo en Host y Cuda... ");
+    inicializar(&cuerpoA[HOST], HOST);
+    inicializar(&cuerpoB[HOST], HOST);
+    inicializar(&cuerpoA[CUDA], CUDA);
+    inicializar(&cuerpoB[CUDA], CUDA);
+    printf("Hecho.\n");
+
+    for (int i=0; i<3; i++)
+    {
+        for(int j=0;j<3; j++)
+        {
+            cuerpoA[HOST].AE[i][j] = AE[i][j];
+            cuerpoA[HOST].BE[i][j] = BE[i][j];
+            cuerpoA[HOST].DTE[i][j] = DTE[i][j];
+            cuerpoB[HOST].AE[i][j] = AE[i][j];
+            cuerpoB[HOST].BE[i][j] = BE[i][j];
+            cuerpoB[HOST].DTE[i][j] = DTE[i][j];
+        }
+        cuerpoA[HOST].CTE[i] = CTE[i];
+        cuerpoA[HOST].DTTE[i] = DTTE[i];
+        cuerpoB[HOST].CTE[i] = CTE[i];
+        cuerpoB[HOST].DTTE[i] = DTTE[i];
+    }
+    for( ex=1; ex<=nexA; ex++)
+        for( j=1; j<=3; j++)
+            cuerpoA[HOST].exT[ex-1][j-1]=exA[ex-1][j-1];
+    for( ex=1; ex<=nexB; ex++)
+        for( j=1; j<=3; j++)
+            cuerpoB[HOST].exT[ex-1][j-1]=exB[ex-1][j-1];
+    for( el=1; el<=nelA; el++)
+    {
+        for( j=1; j<=3; j++)
+        {
+            cuerpoA[HOST].conT[el-1][j-1]=conA[el-1][j-1];
+            cuerpoA[HOST].ndT[el-1][j-1]=ndA[el-1][j-1];
+        }
+        for( j=1; j<=9; j++)
+            cuerpoA[HOST].locT[el-1][j-1]=locA[el-1][j-1];
+    }
+    for( el=1; el<=nelB; el++)
+    {
+        for( j=1; j<=3; j++)
+        {
+            cuerpoB[HOST].conT[el-1][j-1]=conB[el-1][j-1];
+            cuerpoB[HOST].ndT[el-1][j-1]=ndB[el-1][j-1];
+        }
+        for( j=1; j<=9; j++)
+            cuerpoB[HOST].locT[el-1][j-1]=locB[el-1][j-1];
+    }
+
+    //Vinculamos variables globales con los del cuerpo del host. Por si acaso.
+    AE_A = cuerpoA[HOST].AE_T;
+    BE_A = cuerpoA[HOST].BE_T;
+    AT_A = cuerpoA[HOST].AT_T;
+    BT_A = cuerpoA[HOST].BT_T;
+    CTE_A = cuerpoA[HOST].CTE_T;
+    DTE_A = cuerpoA[HOST].DTE_T;
+
+    AE_B = cuerpoB[HOST].AE_T;
+    BE_B = cuerpoB[HOST].BE_T;
+    AT_B = cuerpoB[HOST].AT_T;
+    BT_B = cuerpoB[HOST].BT_T;
+    CTE_B = cuerpoB[HOST].CTE_T;
+    DTE_B = cuerpoB[HOST].DTE_T;
+
     printf("==================== Entrando en INTEGRAL ====================\n");
     //* Lee los datos del problema
     
-    //* Asigna datos de entrada del cuerpo "A"
-    nexT=nexA;
-    nelT=nelA;
-    ET=EA;
-    alT=alA;
-    nuT=nuA;
-    GT=ET/(2.0*(1.0+nuT));
-    for( ex=1; ex<=nexA; ex++)      
-    {
-        for( j=1; j<=3; j++)        
-        {
-            exT[ex-1][j-1]=exA[ex-1][j-1];
-        }
-    }
-    for( el=1; el<=nelA; el++)      
-    {
-        for( j=1; j<=3; j++)        
-        {
-            conT[el-1][j-1]=conA[el-1][j-1];
-            ndT[el-1][j-1]=ndA[el-1][j-1];
-        }
-        for( j=1; j<=9; j++)        
-        {
-            locT[el-1][j-1]=locA[el-1][j-1];
-        }
-    }
+
     //* Abre ficheros
     
     //* Calcula coeficientes del cuerpo "A"
     printf("++++++++ Calcula coeficientes del cuerpo \"A\" ++++++++\n");
     tiniA = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Inicio calculo coeficientes.\n",tiniA);
-    AE_A = (double**)malloc((3*nelT)*sizeof(double*));int iTemp;for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        AE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
-    }
-    BE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        BE_A[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
-    }
-    AT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
-    {
-        AT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    BT_A = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
-    {
-        BT_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    CTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        CTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    DTE_A = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        DTE_A[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    COEFICIENTES(AE_A,BE_A,AT_A,BT_A,CTE_A,DTE_A);if(enExcepcion==1)return;
+
+    COEFICIENTES(&cuerpoA[HOST]);if(enExcepcion==1)return;
     
     tfinA = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Final calculo coeficientes.\n",tfinA);
@@ -355,62 +400,15 @@ void INTEGRAL()
     //* Cierra ficheros
     
     //* Asigna datos de entrada del cuerpo "B"
-    nexT=nexB;
-    nelT=nelB;
-    ET=EB;
-    alT=alB;
-    nuT=nuB;
-    GT=ET/(2.0*(1.0+nuT));
-    for( ex=1; ex<=nexB; ex++)      
-    {
-        for( j=1; j<=3; j++)        
-        {
-            exT[ex-1][j-1]=exB[ex-1][j-1];
-        }
-    }
-    for( el=1; el<=nelB; el++)      
-    {
-        for( j=1; j<=3; j++)        
-        {
-            conT[el-1][j-1]=conB[el-1][j-1];
-            ndT[el-1][j-1]=ndB[el-1][j-1];
-        }
-        for( j=1; j<=9; j++)        
-        {
-            locT[el-1][j-1]=locB[el-1][j-1];
-        }
-    }
+
     //* Abre ficheros
     
     //* Calcula coeficientes del cuerpo "B"
     printf("+++++++ Calcula coeficientes del cuerpo \"B\" +++++++\n");
     tiniB = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Inicio calculo coeficientes.\n",tiniB);
-    AE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        AE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
-    }
-    BE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        BE_B[iTemp] = (double*)malloc((3*nelT)*sizeof(double));
-    }
-    AT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
-    {
-        AT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    BT_B = (double**)malloc((nelT)*sizeof(double*));for(iTemp=0;iTemp<nelT;iTemp++)
-    {
-        BT_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    CTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        CTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    DTE_B = (double**)malloc((3*nelT)*sizeof(double*));for(iTemp=0;iTemp<3*nelT;iTemp++)
-    {
-        DTE_B[iTemp] = (double*)malloc((nelT)*sizeof(double));
-    }
-    COEFICIENTES(AE_B,BE_B,AT_B,BT_B,CTE_B,DTE_B);if(enExcepcion==1)return;
+
+    COEFICIENTES(&cuerpoB[HOST]);if(enExcepcion==1)return;
     
     //* Cierra ficheros
     
@@ -422,6 +420,47 @@ void INTEGRAL()
     
     printf("==================== Saliendo de INTEGRAL ===================\n");
     printf("TIEMPOOOOOOOOO: %f\n",(tfinA-tiniA)+(tfinB-tiniB));
+
+    // Volcamos estructuras en variables globales para que pueda continuar el proceso.
+    for (int i=0; i<3; i++)
+    {
+        for(int j=0;j<3; j++)
+        {
+            AE[i][j] = cuerpoA[HOST].AE[i][j];
+            BE[i][j] = cuerpoA[HOST].BE[i][j];
+            DTE[i][j] = cuerpoA[HOST].DTE[i][j];
+            AE[i][j] = cuerpoB[HOST].AE[i][j];
+            BE[i][j] = cuerpoB[HOST].BE[i][j];
+            DTE[i][j] = cuerpoB[HOST].DTE[i][j];
+        }
+        CTE[i] = cuerpoA[HOST].CTE[i];
+        DTTE[i] = cuerpoA[HOST].DTTE[i];
+        CTE[i] = cuerpoB[HOST].CTE[i];
+        DTTE[i] = cuerpoB[HOST].DTTE[i];
+    }
+    AT = cuerpoB->AT;
+    BT = cuerpoB->BT;
+    nexT = cuerpoB->nexT;
+    nelT = cuerpoB->nelT;
+    ET = cuerpoB->ET;
+    alT = cuerpoB->alT;
+    nuT = cuerpoB->nuT;
+    GT = cuerpoB->GT;
+
+    for( ex=1; ex<=nexB; ex++)
+        for( j=1; j<=3; j++)
+            exT[ex-1][j-1]=cuerpoB[HOST].exT[ex-1][j-1];
+
+    for( el=1; el<=nelB; el++)
+    {
+        for( j=1; j<=3; j++)
+        {
+            conT[el-1][j-1]=cuerpoB[HOST].conT[el-1][j-1];
+            ndT[el-1][j-1]=cuerpoB[HOST].ndT[el-1][j-1];
+        }
+        for( j=1; j<=9; j++)
+            locT[el-1][j-1]=cuerpoB[HOST].locT[el-1][j-1];
+    }
 }
 
 

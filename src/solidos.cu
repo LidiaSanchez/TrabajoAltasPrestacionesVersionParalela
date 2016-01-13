@@ -287,12 +287,11 @@ int main(void)
     printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
 
 
-    free(AE_A);free(AE_B);
-    free(BE_A);free(BE_B);
-    free(AT_A);free(AT_B);
-    free(BT_A);free(BT_B);
-    free(CTE_A);free(CTE_B);
-    free(DTE_A);free(DTE_B);
+    finalizar(&cuerpoA[HOST]);
+    finalizar(&cuerpoA[CUDA]);
+    finalizar(&cuerpoB[HOST]);
+    finalizar(&cuerpoB[CUDA]);
+
 
     return 0;
 }

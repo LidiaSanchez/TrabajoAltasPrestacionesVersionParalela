@@ -527,9 +527,9 @@ void SISTLOCAL()
 
 
 
-void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T)
+void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
 {
-    VarPack varPack;
+
     int  nd,el;	//Auxiliares
     int  i,j;
     double  extraux;
@@ -540,6 +540,56 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
     double  C1[3],C2[3],C3[3],C4[3],C5[3],C6[3],C7[3];
     double  D1[3][3],D2[3][3],D3[3][3],D4[3][3],D5[3][3],D6[3][3],D7[3][3];
 
+
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+
+    double AE[3][3];
+    double BE[3][3];
+    double DTE[3][3];
+    for (int i=0; i< 3; i++)
+        for(int j=0; j<3; j++)
+        {
+            AE[i][j] = entradaCuerpo->AE[i][j];
+            BE[i][j] = entradaCuerpo->BE[i][j];
+            DTE[i][j] = entradaCuerpo->DTE[i][j];
+        }
+
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
+
+
     // Calcula constantes
     cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
     cte2=1.0-2.0*nuT;
@@ -547,7 +597,8 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
     cte4=4.0*4.0*atan(1.0);
     cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
 
-    varPack.tipoSimetria = ObtenerSimetria();
+
+    tipoSimetria = ObtenerSimetria();
 
     // Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
     for( el=1; el<=nelT; el++)
@@ -558,31 +609,34 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
             // Asigna punto de colocacion
             for (i = 1; i <= 3; i++)
             {
-                varPack.ndCol[i - 1] = ndT[nd - 1][i - 1];
+                ndCol[i - 1] = ndT[nd - 1][i - 1];
             }
+
             // Asigna tipo de integral
-            varPack.intenum = el != nd;
+            intenum = el != nd;
 
             // Asigna extremos
             for (i = 1; i <= 3; i++)
             {
                 for (j = 1; j <= 3; j++)
                 {
-                    varPack.extr[i - 1][j - 1] = exT[conT[el - 1][i - 1] - 1][j - 1];
+                    extr[i - 1][j - 1] = exT[conT[el - 1][i - 1] - 1][j - 1];
                 }
             }
 
-            INTEGRA(&varPack, AE, BE, &AT, &BT, CTE, DTE);
+            INTEGRA(entradaCuerpo, AE, BE, &AT, &BT, CTE, DTE);
             if (enExcepcion == 1)return;
 
 
-            switch (varPack.tipoSimetria)
+
+
+            switch (tipoSimetria)
             {
                 case NO_SIMETRIA_IMPLICITA:
                     if((tpproE == 1) || (tpproTE == 1))
                     {
                         // Cambia de coordenadas los coeficientes elasticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                        TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     }
                     break;
 
@@ -595,24 +649,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum = 1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum = 1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Combina coeficientes
                     // Elásticos
@@ -654,7 +708,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                             }
                         }
                         // Cambia de coordenadas los coeficientes elasticos y termoelásticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                        TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     }
                     // Térmicos
                     if((tpproT == 1) || (tpproTE == 1))
@@ -673,24 +727,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum=1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Elásticos
                     // Combina coeficientes
@@ -732,7 +786,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                             }
                         }
                         // Cambia de coordenadas los coeficientes elasticos
-                        TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                        TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     }
                     // Térmicos
                     if((tpproT == 1) || (tpproTE == 1))
@@ -744,7 +798,8 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
 
 
 
-                case SIMETRIA_PLANO_0YZ:
+                case SIMETRIA_PLANO_0YZ:{
+
                     // Asigna extremos
                     for( i=1; i<=3; i++)
                     {
@@ -752,23 +807,29 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
+
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+
+
+                    intenum=1;
+
+
+
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Elasticos
                     // Combina coeficientes
@@ -811,7 +872,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     // Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
 
                     // Térmicos
                     if((tpproT == 1) || (tpproTE == 1))
@@ -819,7 +880,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         AT=AT+AT1;
                         BT=BT+BT1;
                     }
-                    break;
+                    break; }
 
 
 
@@ -831,24 +892,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum=1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxy y Oxz
 
@@ -859,15 +920,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE2, BE2,&AT2,&BT2,(double*)C2, D2);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxz
 
@@ -878,15 +939,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE3, BE3,&AT3,&BT3,(double*)C3, D3);if(enExcepcion==1)return;
 
                     // Elasticos
                     // Combina coeficientes
@@ -913,7 +974,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     // Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     // Térmicos
                     if((tpproT == 1) || (tpproTE == 1))
                     {
@@ -931,24 +992,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum=1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxy y Oyz
 
@@ -959,15 +1020,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE2, BE2,&AT2,&BT2,(double*)C2, D2);if(enExcepcion==1)return;
 
                     // Integra simetrico Oyz
 
@@ -978,22 +1039,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE3, BE3,&AT3,&BT3,(double*)C3, D3);if(enExcepcion==1)return;
 
                     // Elasticos
                     // Combina coeficientes
@@ -1023,7 +1084,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     // Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     // Térmicos
                     if((tpproT == 1) || (tpproTE == 1))
                     {
@@ -1044,24 +1105,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum=1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum=1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1,(double*)C1, D1);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxz y Oyz
 
@@ -1072,15 +1133,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE2, BE2,&AT2,&BT2,(double*)C2, D2);if(enExcepcion==1)return;
 
 
                     // Integra simetrico Oxz
@@ -1092,22 +1153,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE3, BE3,&AT3,&BT3,(double*)C3, D3);if(enExcepcion==1)return;
 
                     // Elasticos
                     // Combina coeficientes
@@ -1138,7 +1199,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     }
 
                     // Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
 
                     // Termicos
                     if((tpproT == 1) || (tpproTE == 1))
@@ -1159,24 +1220,24 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
                     // Asigna tipo de integral
-                    varPack.intenum = 1;
-                    INTEGRA(&varPack,AE1,BE1,&AT1,&BT1,C1,D1);if(enExcepcion==1)return;
+                    intenum = 1;
+                    INTEGRA(entradaCuerpo, AE1, BE1,&AT1,&BT1, (double*)C1, D1);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxy y Oxz
 
@@ -1187,15 +1248,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE2,BE2,&AT2,&BT2,C2,D2);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE2, BE2,&AT2,&BT2, (double*)C2, D2);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxy,Oxz y Oyz
 
@@ -1204,17 +1265,17 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     {
                         for( j=1; j<=3; j++)
                         {
-                            varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                            extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    INTEGRA(&varPack,AE3,BE3,&AT3,&BT3,C3,D3);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE3, BE3,&AT3,&BT3, (double*)C3, D3);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxz
 
@@ -1225,22 +1286,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    INTEGRA(&varPack,AE4,BE4,&AT4,&BT4,C4,D4);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE4, BE4,&AT4,&BT4, (double*)C4, D4);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxz y Oyz
 
@@ -1251,15 +1312,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 3)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE5,BE5,&AT5,&BT5,C5,D5);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE5, BE5,&AT5,&BT5, (double*)C5, D5);if(enExcepcion==1)return;
 
                     // Integra simetrico Oyz
 
@@ -1270,22 +1331,22 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 1)
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
                     // Intercambia extremos 2 y 3
                     for( i=1; i<=3; i++)
                     {
-                        extraux=varPack.extr[2-1][i-1];
-                        varPack.extr[2-1][i-1]=varPack.extr[3-1][i-1];
-                        varPack.extr[3-1][i-1]=extraux;
+                        extraux=extr[2-1][i-1];
+                        extr[2-1][i-1]=extr[3-1][i-1];
+                        extr[3-1][i-1]=extraux;
                     }
-                    INTEGRA(&varPack,AE6,BE6,&AT6,&BT6,C6,D6);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE6, BE6,&AT6,&BT6, (double*)C6, D6);if(enExcepcion==1)return;
 
                     // Integra simetrico Oxy y Oyz
 
@@ -1296,15 +1357,15 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         {
                             if(j == 2)
                             {
-                                varPack.extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=exT[conT[el-1][i-1]-1][j-1];
                             }
                             else
                             {
-                                varPack.extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
+                                extr[i-1][j-1]=-exT[conT[el-1][i-1]-1][j-1];
                             }
                         }
                     }
-                    INTEGRA(&varPack,AE7,BE7,&AT7,&BT7,C7,D7);if(enExcepcion==1)return;
+                    INTEGRA(entradaCuerpo, AE7, BE7,&AT7,&BT7, (double*)C7, D7);if(enExcepcion==1)return;
 
                     // Elasticos
                     // Combina coeficientes
@@ -1334,7 +1395,7 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                         }
                     }
                     // Cambia de coordenadas los coeficientes elasticos
-                    TRANSFORMA(AE,BE,&el);if(enExcepcion==1)return;
+                    TRANSFORMA(entradaCuerpo,AE,BE,&el);if(enExcepcion==1)return;
                     // Termicos
                     if((tpproT == 1) || (tpproTE == 1))
                     {
@@ -1347,10 +1408,17 @@ void COEFICIENTES(double** AE_T,double** BE_T,double** AT_T,double** BT_T,double
                     printf(" **** ERROR **** => Simetrias erroneas\n"); enExcepcion=1;return;
             }
 
+            for (int i=0; i< 3; i++)
+                for(int j=0; j<3; j++)
+                {
+                    entradaCuerpo->AE[i][j] = AE[i][j];
+                    entradaCuerpo->BE[i][j] = BE[i][j];
+                    entradaCuerpo->DTE[i][j] = DTE[i][j];
+                }
 
             // Almacena coeficientes
             reg=(el-1)*nelT+nd;
-            ALMACENA(&el,&nd,AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
+            ALMACENA(&el,&nd,entradaCuerpo, AE_T,BE_T,AT_T,BT_T,CTE_T,DTE_T);if(enExcepcion==1)return;
         }
     }
 

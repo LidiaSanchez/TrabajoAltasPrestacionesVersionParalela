@@ -6,7 +6,8 @@
 
 /**
  * <p>Inicializa una estructura de entrada de cuerpo en el contexto especificado.</p><br/>
- * <p>Los diferentes tipos de contexto se especifican en el parámetro tipoEntrada</p>
+ * <p>Los diferentes tipos de contexto se especifican en el parámetro tipoEntrada. <b>NOTA:</b> aunque los componentes
+ * de la estructura estén inicializados en el contexto especificado, la estructura sólo es accesible desde el HOST.</p>
  * <p>Cuando el contexto especificado es CUDA, los elementos de la estructura se inicializan con memoria del
  * dispositivo. Estos elementos no pueden ser accedidos desde un contexto externo.</p>
  *
@@ -70,6 +71,21 @@ void copiarMatriz(void** matrizDestino, void** matrizOrigen, int tamanioElemento
 void liberarMatriz(void** matriz, CONTEXTO contexto);
 
 /**
+ * Genera un vector del tamaño especificado, válido dentro del contexto especificado.
+ */
+void* generarVector(int tamanioElemento, int longitud, CONTEXTO contexto);
+
+/**
+ * Copia un vector de un contexto a otro.
+ */
+void copiarVector(void* vectorDestino, void* vectorOrigen, int tamanioElemento, int longitud, int direccion);
+
+/**
+ * Libera el vector del contexto especificado.
+ */
+void liberarVector(void* vector, CONTEXTO contexto);
+
+/**
  * Allocates a 2 dimensional array at the host.
  *
  * Its elements are initialized to 0 by default.
@@ -111,6 +127,26 @@ void ** alloc2DOnDevice(int rows, int cols, int sizeOfElement);
  * matriz[i][j].
  */
 __global__ void __organize2DMatrix(void** matrix, int rows, int cols, int sizeOfElement);
+
+/**
+ * Copia el contenido de una estructura en otra. El contexto de los componentes de la estructura se especifican en
+ * dirección.
+ */
+void copiarEstructura(EntradaCuerpo* destino, EntradaCuerpo* origen, int direccion);
+
+/**
+ * Pasa una estructura al contexto del dispositivo. La estructura DEBE estar inicializada en el contexto del
+ * dispositivo, de lo contrario, la estructura usada en el dispositivo podría acceder a miembros de la estructura
+ * apuntando a memoria del host (operación ilegal).
+ */
+EntradaCuerpo* pasarADispositivo(EntradaCuerpo* entradaCuerpo);
+
+
+/**
+ * Obtiene una estructura pasada previamente al dispositivo de nuevo al host.
+ * La estructura referenciada por parámetro es liberada de memoria del dispositivo.
+ */
+EntradaCuerpo  obtenerDesdeDispositivo(EntradaCuerpo* entradaCuerpoDeDispositivo);
 
 /**
  * Libera el contenido de una estructura de cuerpo en función del contexto en el que se encuentre inicializada.

@@ -2,6 +2,9 @@
 
 int enExcepcion;
 
+EntradaCuerpo cuerpoA[2];
+EntradaCuerpo cuerpoB[2];
+
 char titulo[80];// Título del problema
 char nomArchSalTer[80];// Nombre del archivo de salida [térmico]
 char nomArchSalElas[80];// Nombre del archivo de salida [elástico

@@ -11,9 +11,44 @@
 //*                                                                                      *
 //****************************************************************************************
 
-void ANALITICA(VarPack* varPack, double AEA[3][3],double BEA[3][3],double* punteroA_ATA,double* punteroA_BTA,double CTEA[3],double DTEA[3][3],double n[3],double bar[3])
+void ANALITICA(EntradaCuerpo* entradaCuerpo, double AEA[3][3],double BEA[3][3],double* punteroA_ATA,double* punteroA_BTA,double * CTEA,double DTEA[3][3],double * n,double * bar)
 {
     //* Declaracion de variables
+// Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+    double ** AE = entradaCuerpo->AE;
+    double ** BE = entradaCuerpo->BE;
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+    double ** DTE = entradaCuerpo->DTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
 
     /*double AEA[3][3];*	//*double BEA[3][3];*/;      //Coeficientes de integracion elasticos
@@ -88,18 +123,18 @@ void ANALITICA(VarPack* varPack, double AEA[3][3],double BEA[3][3],double* punte
 
     for( i=1; i<=3; i++)      
     {
-        R=sqrt(pow((varPack->extr[i-1][1-1]-varPack->extr[i+1-1][1-1]),2)+pow((varPack->extr[i-1][2-1]-varPack->extr[i+1-1][2-1]),2)+pow((varPack->extr[i-1][3-1]-varPack->extr[i+1-1][3-1]),2));
-        E11=(varPack->extr[i-1][1-1]-varPack->extr[i+1-1][1-1])/R;
-        E12=(varPack->extr[i-1][2-1]-varPack->extr[i+1-1][2-1])/R;
-        E13=(varPack->extr[i-1][3-1]-varPack->extr[i+1-1][3-1])/R;
+        R=sqrt(pow((extr[i-1][1-1]-extr[i+1-1][1-1]),2)+pow((extr[i-1][2-1]-extr[i+1-1][2-1]),2)+pow((extr[i-1][3-1]-extr[i+1-1][3-1]),2));
+        E11=(extr[i-1][1-1]-extr[i+1-1][1-1])/R;
+        E12=(extr[i-1][2-1]-extr[i+1-1][2-1])/R;
+        E13=(extr[i-1][3-1]-extr[i+1-1][3-1])/R;
         E21=E32*E13-E33*E12;
         E22=E33*E11-E31*E13;
         E23=E31*E12-E32*E11;
-        DD=fabs(E21*(varPack->extr[i-1][1-1]-XB)+E22*(varPack->extr[i-1][2-1]-YB)+E23*(varPack->extr[i-1][3-1]-ZB));
+        DD=fabs(E21*(extr[i-1][1-1]-XB)+E22*(extr[i-1][2-1]-YB)+E23*(extr[i-1][3-1]-ZB));
         for( j=i; j<=i+1; j++)            
         {
-            R=sqrt(pow((XB-varPack->extr[j-1][1-1]),2)+pow((YB-varPack->extr[j-1][2-1]),2)+pow((ZB-varPack->extr[j-1][3-1]),2));
-            XI1=(varPack->extr[j-1][1-1]-XB)*E11+(varPack->extr[j-1][2-1]-YB)*E12+(varPack->extr[j-1][3-1]-ZB)*E13;
+            R=sqrt(pow((XB-extr[j-1][1-1]),2)+pow((YB-extr[j-1][2-1]),2)+pow((ZB-extr[j-1][3-1]),2));
+            XI1=(extr[j-1][1-1]-XB)*E11+(extr[j-1][2-1]-YB)*E12+(extr[j-1][3-1]-ZB)*E13;
 
             SE=XI1/R;
 
@@ -281,9 +316,44 @@ void SUBDIVIDE(double extrs[4][3],double subextr[4][4][3])
 //*                                                                                      *
 //****************************************************************************************
 
-void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punteroA_ATN,double* punteroA_BTN,double CTEN[3],double DTEN[3][3],double n[3],double* punteroA_distancia)
+void NUMERICA(EntradaCuerpo* entradaCuerpo, double AEN[3][3],double BEN[3][3],double* punteroA_ATN,double* punteroA_BTN,double * CTEN,double DTEN[3][3],double * n,double* punteroA_distancia)
 {
     //* Declaracion de variables
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+    double ** AE = entradaCuerpo->AE;
+    double ** BE = entradaCuerpo->BE;
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+    double ** DTE = entradaCuerpo->DTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
 
     /*double AEN[3][3];*	//*double BEN[3][3];*/;      //Coeficientes de integracion elasticos
@@ -310,7 +380,7 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
         lado[i-1]=0.0;
         for( j=1; j<=3; j++)          
         {
-            lado[i-1]=lado[i-1]+pow((varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1]),2);
+            lado[i-1]=lado[i-1]+pow((extr[i+1-1][j-1]-extr[i-1][j-1]),2);
         }
         lado[i-1]=sqrt(lado[i-1]);
     }
@@ -318,7 +388,7 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
     {
         for( j=1; j<=3; j++)        
         {
-            lad[i-1][j-1]= (varPack->extr[i+1-1][j-1]-varPack->extr[i-1][j-1])/lado[i-1];
+            lad[i-1][j-1]= (extr[i+1-1][j-1]-extr[i-1][j-1])/lado[i-1];
         }
     }*/
     //* Calcula el area del elemento (3 lados)
@@ -326,7 +396,7 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
     Area=sqrt(s*(s-lado[1-1])*(s-lado[2-1])*(s-lado[3-1]));
 
     //* Calcula los puntos de integracón
-    GAUSS(varPack, punt);if(enExcepcion==1)return;
+    GAUSS(entradaCuerpo, punt);if(enExcepcion==1)return;
 
     //* funciones peso
     Afp=(155.0+sqrt(15.0))/2400.0;
@@ -384,9 +454,9 @@ void NUMERICA(VarPack* varPack, double AEN[3][3],double BEN[3][3],double* punter
     //C5=alT*(1.D0+nuT)/(8.D0*3.141592654D0*(1.D0-nuT))
 
 
-    XP=varPack->ndCol[1-1];
-    YP=varPack->ndCol[2-1];
-    ZP=varPack->ndCol[3-1];
+    XP=ndCol[1-1];
+    YP=ndCol[2-1];
+    ZP=ndCol[3-1];
     XNUE=n[1-1];
     YNUE=n[2-1];
     ZNUE=n[3-1];

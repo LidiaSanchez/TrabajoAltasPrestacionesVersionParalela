@@ -31,7 +31,7 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod);
 //*                                                                            *
 //******************************************************************************
 
-void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3]);
+void INTEGRA(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double * CT,double DT[3][3]);
 //******************************************************************************
 //*                                                                            *
 //*  Input:       el = elemento sobre el que se ha integrado                   *
@@ -42,7 +42,7 @@ void INTEGRA(VarPack* varPack,double AET[3][3],double BET[3][3],double* punteroA
 //*                                                                            *
 //******************************************************************************
 
-void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el);
+void TRANSFORMA(EntradaCuerpo* entradaCuerpo, double AETR[3][3],double BETR[3][3], int* punteroA_el);
 //******************************************************************************
 //*                                                                            *
 //*  Input:                                                                    *
@@ -52,7 +52,7 @@ void TRANSFORMA(double AETR[3][3],double BETR[3][3],int* punteroA_el);
 //*                                                                            *
 //******************************************************************************
 
-void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
+void ALMACENA(int* punteroA_el,int* punteroA_nd, EntradaCuerpo* entradaCuerpo,double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
 
 
 #endif /* FUNCIONESB_H_ */

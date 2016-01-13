@@ -1,8 +1,43 @@
 #include "funcionesD.h"
 
-void GAUSS(VarPack* varPack, double punt[7][3])
+void GAUSS(EntradaCuerpo* entradaCuerpo, double punt[7][3])
 {
     //* Declaracion de variables
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+    double ** AE = entradaCuerpo->AE;
+    double ** BE = entradaCuerpo->BE;
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+    double ** DTE = entradaCuerpo->DTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
 
     double  cnat[7][3]; //valores de las coordenadas naturales
     double  acnat;  //auxiliares
@@ -46,7 +81,7 @@ void GAUSS(VarPack* varPack, double punt[7][3])
     for( p=0; p<7; p++)        
         for( i=0; i<3; i++)            
             for( j=0; j<3; j++)                
-                punt[p][i]=punt[p][i]+cnat[p][j]*varPack->extr[j][i];
+                punt[p][i]=punt[p][i]+cnat[p][j]*extr[j][i];
 
     return;
 }

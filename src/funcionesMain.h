@@ -1,4 +1,5 @@
 #include "funcionesPersonales.h"
+#include "funcionesCuda.h"
 #include "variables.h"
 
 #include "funcionesA.h"

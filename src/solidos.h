@@ -11,6 +11,7 @@
 #include "funcionesB.h"
 #include "funcionesC.h"
 #include "funcionesD.h"
+#include "funcionesCuda.h"
 
 #ifndef SOLIDOS_H_
 #define SOLIDOS_H_

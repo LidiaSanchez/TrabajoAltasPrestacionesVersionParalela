@@ -49,13 +49,6 @@ enum SIMETRIAS
     SIMETRIA_TRES_PLANOS_COORDENADOS    =   7
 };
 
-typedef struct VarPack
-{
-    double ndCol[3];
-    char intenum;
-    int tipoSimetria;
-    double extr[4][3];
-} VarPack;
 
 typedef struct EntradaCuerpo
 {
@@ -73,15 +66,30 @@ typedef struct EntradaCuerpo
     double ** locT;
 
     // Coeficientes
-    double ** AE;
-    double ** BE;
-    double ** AT;
-    double ** BT;
-    double ** CTE;
-    double ** DTE;
+    double ** AE_T;
+    double ** BE_T;
+    double ** AT_T;
+    double ** BT_T;
+    double ** CTE_T;
+    double ** DTE_T;
 
-    VarPack varPack;
+    double ** AE;// Coeficientes A elasticos
+    double ** BE;// Coeficientes B elasticos
+    double  AT;// Coeficiente A termico
+    double  BT;// Coeficiente B termico
+    double * CTE;// Coeficientes C termoelasticos
+    double * DTTE;// Coeficientes D termoelasticos
+    double ** DTE;// Coeficientes D termoelasticos
+
+    double * ndCol;
+    char intenum;
+    int tipoSimetria;
+    double ** extr;
 } EntradaCuerpo;
+
+
+extern EntradaCuerpo cuerpoA[2];
+extern EntradaCuerpo cuerpoB[2];
 
 extern int enExcepcion;
 

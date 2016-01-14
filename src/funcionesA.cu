@@ -585,6 +585,19 @@ void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
     double * ndCol = entradaCuerpo->ndCol;
     double ** extr = entradaCuerpo->extr;
 
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
 
     int &tipoSimetria = entradaCuerpo->tipoSimetria;
     char &intenum = entradaCuerpo->intenum;
@@ -598,7 +611,7 @@ void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
     cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
 
 
-    tipoSimetria = ObtenerSimetria();
+    tipoSimetria = ObtenerSimetria(entradaCuerpo);
 
     // Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
     for( el=1; el<=nelT; el++)
@@ -1424,10 +1437,15 @@ void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
 
 }
 
-int ObtenerSimetria()
+int ObtenerSimetria(EntradaCuerpo* entradaCuerpo)
 {
     // Buscamos la simetria
     int simetria;
+
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+
 
     if ((simXY != 1) && (simXZ != 1) && (simYZ != 1))
         simetria = NO_SIMETRIA_IMPLICITA;

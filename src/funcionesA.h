@@ -150,6 +150,6 @@ void CHETRAC();
 void CHEINTE();
 
 
-int ObtenerSimetria();
+int ObtenerSimetria(EntradaCuerpo* entradaCuerpo);
 #endif /* FUNCIONESA_H_ */
 

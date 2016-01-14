@@ -180,6 +180,20 @@ void copiarEstructura(EntradaCuerpo* destino, EntradaCuerpo* origen, int direcci
     destino->nuT = origen->nuT;
     destino->GT = origen->GT;
 
+    destino->simXY = origen->simXY;// Flag de simetría respecto del plano xOy
+    destino->simXZ = origen->simXZ;// Flag de simetría respecto del plano xOz
+    destino->simYZ = origen->simYZ;// Flag de simetría respecto del plano yOz
+    destino->tpproE = origen->tpproE;// Flag de tipo de problema elastico
+    destino->tpproT = origen->tpproT;// Flag de tipo de problema termico
+    destino->tpproTE = origen->tpproTE;// Flag de tipo de problema termoelastico
+    destino->tpcarFP = origen->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    destino->tpcarFL = origen->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    destino->tpcarFD = origen->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    destino->tpcarFC = origen->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    destino->tpcarPP = origen->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    destino->enExcepcion = origen->enExcepcion;
+
     copiarMatriz((void**)destino->exT, (void**)origen->exT, sizeof(double), 5000, 3, direccion);
     copiarMatriz((void**)destino->conT, (void**)origen->conT, sizeof(int), 5000, 3, direccion);
     copiarMatriz((void**)destino->ndT, (void**)origen->ndT, sizeof(double), 5000, 3, direccion);

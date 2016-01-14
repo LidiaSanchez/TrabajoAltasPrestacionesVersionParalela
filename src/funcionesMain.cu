@@ -288,6 +288,20 @@ void INTEGRAL()
     out14=84;
 
     // Asignamos valores mínimos del cuerpo A para poder inicializarlo
+    cuerpoA[HOST].simXY = simXY;// Flag de simetría respecto del plano xOy
+    cuerpoA[HOST].simXZ = simXZ;// Flag de simetría respecto del plano xOz
+    cuerpoA[HOST].simYZ = simYZ;// Flag de simetría respecto del plano yOz
+    cuerpoA[HOST].tpproE = tpproE;// Flag de tipo de problema elastico
+    cuerpoA[HOST].tpproT = tpproT;// Flag de tipo de problema termico
+    cuerpoA[HOST].tpproTE = tpproTE;// Flag de tipo de problema termoelastico
+    cuerpoA[HOST].tpcarFP = tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    cuerpoA[HOST].tpcarFL = tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    cuerpoA[HOST].tpcarFD = tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    cuerpoA[HOST].tpcarFC = tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    cuerpoA[HOST].tpcarPP = tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    cuerpoA[HOST].enExcepcion = enExcepcion;
+
     cuerpoA[HOST].nexT = nexA;
     cuerpoA[HOST].nelT = nelA;
     cuerpoA[HOST].ET = EA;
@@ -302,6 +316,19 @@ void INTEGRAL()
 
 
     // Asignamos valores mínimos del cuerpo B para poder inicializarlo
+    cuerpoB[HOST].simXY = simXY;// Flag de simetría respecto del plano xOy
+    cuerpoB[HOST].simXZ = simXZ;// Flag de simetría respecto del plano xOz
+    cuerpoB[HOST].simYZ = simYZ;// Flag de simetría respecto del plano yOz
+    cuerpoB[HOST].tpproE = tpproE;// Flag de tipo de problema elastico
+    cuerpoB[HOST].tpproT = tpproT;// Flag de tipo de problema termico
+    cuerpoB[HOST].tpproTE = tpproTE;// Flag de tipo de problema termoelastico
+    cuerpoB[HOST].tpcarFP = tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    cuerpoB[HOST].tpcarFL = tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    cuerpoB[HOST].tpcarFD = tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    cuerpoB[HOST].tpcarFC = tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    cuerpoB[HOST].tpcarPP = tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    cuerpoB[HOST].enExcepcion = enExcepcion;
     cuerpoB[HOST].nexT = nexB;
     cuerpoB[HOST].nelT = nelB;
     cuerpoB[HOST].ET = EB;

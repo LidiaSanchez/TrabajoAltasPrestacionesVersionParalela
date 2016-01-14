@@ -96,6 +96,20 @@ void INTEGRA(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],dou
     int &tipoSimetria = entradaCuerpo->tipoSimetria;
     char &intenum = entradaCuerpo->intenum;
 
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
+
     /*double AET[3][3];*	//*double BET[3][3];*/;      //Coeficientes de integracion elasticos
     double ATT=*punteroA_ATT;double BTT=*punteroA_BTT;;	//Coeficientes de integracion termicos
     /*double CT[3];*	//*double DT[3][3];*/;      //Coeficientes de integracion termoelasticos
@@ -378,6 +392,19 @@ void TRANSFORMA(EntradaCuerpo* entradaCuerpo, double AETR[3][3],double BETR[3][3
     double &nuT = entradaCuerpo->nuT;
     double &alT = entradaCuerpo->alT;
 
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
 
     double ** exT = entradaCuerpo->exT;
     int    ** conT = entradaCuerpo->conT;
@@ -450,6 +477,19 @@ void ALMACENA(int* punteroA_el,int* punteroA_nd, EntradaCuerpo* entradaCuerpo, d
     double** CTE_T = entradaCuerpo->CTE_T;
     double** DTE_T = entradaCuerpo->DTE_T;*/
 
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
 
     double &AT = entradaCuerpo->AT;
     double &BT = entradaCuerpo->BT;

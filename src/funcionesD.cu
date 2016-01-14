@@ -20,6 +20,19 @@ void GAUSS(EntradaCuerpo* entradaCuerpo, double punt[7][3])
     double * DTTE = entradaCuerpo->DTTE;
     double ** DTE = entradaCuerpo->DTE;
 
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
 
     // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
     // vincular variables en C++:

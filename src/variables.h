@@ -81,6 +81,20 @@ typedef struct EntradaCuerpo
     double * DTTE;// Coeficientes D termoelasticos
     double ** DTE;// Coeficientes D termoelasticos
 
+    int  simXY;// Flag de simetría respecto del plano xOy
+    int  simXZ;// Flag de simetría respecto del plano xOz
+    int  simYZ;// Flag de simetría respecto del plano yOz
+    int  tpproE;// Flag de tipo de problema elastico
+    int  tpproT;// Flag de tipo de problema termico
+    int  tpproTE;// Flag de tipo de problema termoelastico
+    int  tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int  tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int enExcepcion;
+
     double * ndCol;
     char intenum;
     int tipoSimetria;

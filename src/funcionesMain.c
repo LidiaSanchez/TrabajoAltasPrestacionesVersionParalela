@@ -426,10 +426,10 @@ void INTEGRAL()
     //------------------------------ FIN 2a SOLUCIÓN ----------------------------------
 
     // Compruebo si tiene que hacer los calculos el maestro o el esclavo en caso de que exista
-    if ( (miId == 0 && numproc == 1) || (miId == 1) )// if (miId == 0) (Comprobación para la 2a Solucion)
+    if ( miId == 0 || miId == 1 )// if (miId == 0) (Comprobación para la 2a Solucion)
     {
         //* Cierra ficheros
-
+        int iTemp;
         //* Asigna datos de entrada del cuerpo "B"
         nexT=nexB;
         nelT=nelB;
@@ -437,6 +437,7 @@ void INTEGRAL()
         alT=alB;
         nuT=nuB;
         GT=ET/(2.0*(1.0+nuT));
+
         for( ex=1; ex<=nexB; ex++)
         {
             for( j=1; j<=3; j++)
@@ -457,12 +458,6 @@ void INTEGRAL()
             }
         }
         //* Abre ficheros
-
-        //* Calcula coeficientes del cuerpo "B"
-        printf("+++++++ Calcula coeficientes del cuerpo \"B\" +++++++\n");
-        tiniB = clock()/CLOCKS_PER_SEC;
-        printf("Inicio calculo coeficientes en cuerpo B.%f\n",tiniB);
-        int iTemp;
 
         //* Reserva la memoria necesaria para cada matriz del cuerpo B
         AE_B = malloc((3*nelT)*sizeof(double*));
@@ -500,7 +495,10 @@ void INTEGRAL()
         {
             DTE_B[iTemp] = malloc((nelT)*sizeof(double));
         }
+    }
 
+    if ( (miId == 0 && numproc == 1) || (miId == 1) )// if (miId == 0) (Comprobación para la 2a Solucion)
+    {
     //------------------------------ 2a SOLUCIÓN -------------------------------------
     // Sincronizamos procesos
     // MPI_Barrier(MPI_COMM_WORLD);
@@ -526,6 +524,12 @@ void INTEGRAL()
     // MPI_Bcast(&DTE_B,  (3*nelT)*nelT,      MPI_DOUBLE,   0,  MPI_COMM_WORLD);
     //------------------------------ FIN 2a SOLUCIÓN ----------------------------------
 
+        //* Calcula coeficientes del cuerpo "B"
+        printf("+++++++ Calcula coeficientes del cuerpo \"B\" +++++++\n");
+        tiniB = clock()/CLOCKS_PER_SEC;
+        printf("Inicio calculo coeficientes en cuerpo B.%f\n",tiniB);
+
+
       //* Calculamos coeficientes
       COEFICIENTES(AE_B,BE_B,AT_B,BT_B,CTE_B,DTE_B);
       if(enExcepcion==1)return;
@@ -545,20 +549,47 @@ void INTEGRAL()
 
     //------------------------------ 3a SOLUCIÓN -------------------------------------
     //* Enviamos las matrices con los coeficientes del cuerpo B al maestro para que pueda resolver las ecuaciones
-    MPI_Gather(&AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,   &AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Gather(&BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,   &BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Gather(&AT_B[0],   nelT*nelT,          MPI_DOUBLE,   &AT_B[0],   nelT*nelT,          MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Gather(&BT_B[0],   nelT*nelT,          MPI_DOUBLE,   &BT_B[0],   nelT*nelT,          MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Gather(&CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,   &CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Gather(&DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,   &DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,   &AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,   &BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&AT_B[0],   nelT*nelT,          MPI_DOUBLE,   &AT_B[0],   nelT*nelT,          MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&BT_B[0],   nelT*nelT,          MPI_DOUBLE,   &BT_B[0],   nelT*nelT,          MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,   &CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // MPI_Gather(&DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,   &DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE, 0, MPI_COMM_WORLD);
     //------------------------------ FIN 3a SOLUCIÓN ----------------------------------
 
-    tfinB = clock()/CLOCKS_PER_SEC;
-    printf("Final calculo coeficientes en B%f\n",tfinB);
-    printf(" Tiempo Total en B= %f segundos\n",tfinB-tiniB);
+        tfinB = clock()/CLOCKS_PER_SEC;
+        printf("Final calculo coeficientes en B%f\n",tfinB);
+        printf(" Tiempo Total en B= %f segundos\n",tfinB-tiniB);
+
+    //------------------------------ 4a SOLUCIÓN -------------------------------------
+        //Enviamos las matrices al maestro
+        if (miId == 1)
+        {
+            MPI_Send(&AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+            MPI_Send(&BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+            MPI_Send(&AT_B[0],   nelT*nelT,          MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+            MPI_Send(&BT_B[0],   nelT*nelT,          MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+            MPI_Send(&CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+            MPI_Send(&DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,    0,      0, MPI_COMM_WORLD);
+        }
 
     }
 
+    // Recibimos las matrices en el maestro en caso de haber más de 1 proceso
+    if (miId == 0 && numproc > 1)
+    {
+        // Recibimos las matrices con los coeficientes del cuerpo B en el maestro
+        printf("Recibiendo datos del esclavo \n");
+        MPI_Status status;
+        MPI_Recv(&AE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        MPI_Recv(&BE_B[0],   (3*nelT)*(3*nelT),  MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        MPI_Recv(&AT_B[0],   nelT*nelT,          MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        MPI_Recv(&BT_B[0],   nelT*nelT,          MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        MPI_Recv(&CTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        MPI_Recv(&DTE_B[0],  (3*nelT)*nelT,      MPI_DOUBLE,    1,      0, MPI_COMM_WORLD,   &status);
+        printf("Recibidos todos los datos del esclavo \n");
+    }
+    //------------------------------ FIN 4a SOLUCIÓN ----------------------------------
     //* Cierra ficheros
 
     //* Final del programa

@@ -42,7 +42,12 @@ Roberto de Castro Rodríguez (@roberdcr)
         - funcionesA.h las líneas [82-96]
         - solidos.c las 168
 
-  *Nota*: Se han dejado comentadas las líneas añadidas o modificadas para cada solución en los archivos anteriormente indicados a excepción de la 3ª Solución.
+  - 4ª Solución:
+
+      Se ha modificado los siguientes archivos:
+          - funcionesMain.c las líneas [564-592]
+
+  *Nota*: Se han dejado comentadas las líneas añadidas o modificadas para cada solución en los archivos anteriormente indicados a excepción de la 4ª Solución.
 
 * Tiempos de ejecución analizados:
 
@@ -58,6 +63,9 @@ MPI              |  MPI_Bcast & MPI_Gather | 50   |      --             |       
 MPI              |  Coeficientes Paralelos | 1    | 26 segundos         | 545 segundos      | 571 segundos
 MPI              |  Coeficientes Paralelos | 2    | 13 segundos         |        --         |     --
 MPI              |  Coeficientes Paralelos | 10   | 13 segundos         |        --         |     --
+MPI              |  MPI_Send & MPi_Recv | 1       | 26 segundos         | 545 segundos      | 571 segundos
+MPI              |  MPI_Send & MPi_Recv | 2       | 13 segundos         | Infinito          | Infinito
+MPI              |  MPI_Send & MPi_Recv | 10      | 13 segundos         | Infinito          | Infinito
 
 *Nota*: Las celdas con "--" significa que ha dado error durante la ejecución.
 
@@ -124,6 +132,8 @@ MPI              |  Coeficientes Paralelos | 10   | 13 segundos         |       
 
   Esta solución sería la ideal ya que hace uso de todos los recursos proporcionados por el sistema para realizar el cálculo de coeficientes, pero no he sido capaz de implementar correctamente el algoritmo anteriormente definido por medio del API que nos provee MPI.
 
+  Para 1 proceso encuentra la solucón, para 2 o más crashea.
+
 ######3ª Solución propuesta *Coeficientes Paralelos*:
 
   Debido a los problemas al intenar implementar el algortimo para la segunda solución, se ha optado por probar una solución más sencilla que tambien paraleliza la obtención de los coeficientes pero de forma limitada haciendo uso únicamente de dos hilos como máximo.
@@ -138,10 +148,33 @@ MPI              |  Coeficientes Paralelos | 10   | 13 segundos         |       
 
     3. Sincronizamos los procesos antes de realizar el cálculo de ecuaciones.
 
-    4. El proceso esclavo envía las matrices con los coeficientes del cuerpo B al proceso maestro para que este calcule las ecuaciones.
+    4. El proceso esclavo envía las matrices con los coeficientes del cuerpo B al proceso maestro por medio de MPI_Gather para que este calcule las ecuaciones posteriormente.
 
   Con esta solución unicamente conseguiriamos reducir como máximo el tiempo del cálculo de los coeficientes a la mitad. En lugar de 26 segundos en total a 13.
 
+  En esta solución a la hora de realizar el calculo de las ecuaciones la aplicación crasheaba. Debido a ello implementamos la siguiente y definitiva solución.
+
+  Para 1 proceso encuentra la solucón, para 2 o más crashea.
+
+######4ª Solución propuesta *MPI_Send & MPi_Recv*:
+
+    Debido a los problemas al intenar implementar el algortimo para la tercera solución, se ha optado por probar una solución más sencilla que tambien paraleliza la obtención de los coeficientes pero de forma limitada haciendo uso únicamente de dos hilos como máximo y utilizando MPI_Send &MPI_Recv. El resto de hilos no realizan ninguna acción.
+
+    Para esta solución planteada ser propone realizar el cálculo de los coeficientes para ambos cuerpos a la vez. No sería la solución más eficaz en cuanto a la optimización de recursos, puesto que únicamente utilizaremos dos procesos, uno para cada cuerpo.
+
+    El algoritmo sería el siguiente:
+
+      1. El proceso maestro calcula los coeficientes para el cuerpo A.
+
+      2. El proceso esclavo calcula los coeficientes para el cuerpo B.
+
+      3. Sincronizamos los procesos antes de realizar el cálculo de ecuaciones para asegurar que el maestro tiene todos los datos antes .
+
+      4. El proceso esclavo envía las matrices con los coeficientes del cuerpo B mediante MPI_Send al proceso maestro que las recibe por medio de MPi_Recv y este calcula las ecuaciones.
+
+    Con esta solución, igual que con la 3ª unicamente conseguiriamos reducir como máximo el tiempo del cálculo de los coeficientes a la mitad. En lugar de 26 segundos en total a 13.
+
+    Para 1 proceso encuentra la solucón, para 2 o más nunca encuentra una solución.
 
 * Bibliografía utilizada:
 

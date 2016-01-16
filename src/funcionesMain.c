@@ -293,11 +293,11 @@ void INTEGRAL()
 
     //------------------------------ 3a SOLUCIÓN -------------------------------------
     //* El maestro envia los datos necesarios para que el esclavo realice los cálculos
-    MPI_Bcast(&nexB,   1,                  MPI_INT,      0,  MPI_COMM_WORLD);
-    MPI_Bcast(&nelB,   1,                  MPI_INT,      0,  MPI_COMM_WORLD);
-    MPI_Bcast(&EB,     1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
-    MPI_Bcast(&alB,    1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
-    MPI_Bcast(&nuB,    1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
+    // MPI_Bcast(&nexB,   1,                  MPI_INT,      0,  MPI_COMM_WORLD);
+    // MPI_Bcast(&nelB,   1,                  MPI_INT,      0,  MPI_COMM_WORLD);
+    // MPI_Bcast(&EB,     1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
+    // MPI_Bcast(&alB,    1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
+    // MPI_Bcast(&nuB,    1,                  MPI_DOUBLE,   0,  MPI_COMM_WORLD);
     //------------------------------ FIN 3a SOLUCIÓN ----------------------------------
 
     // El maestro realiza los cálculos de los coeficientes del cuerpo A

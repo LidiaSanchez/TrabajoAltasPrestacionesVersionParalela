@@ -307,14 +307,29 @@ int main(int argc, char *argv[])
         printf("Final del proceso. Saliendo de ELASTICO.EXE\n");
         tfinal = clock()/CLOCKS_PER_SEC;
         printf(" Tiempo de proceso = %f segundos\n",tfinal-tinicio);
+
+        free(AE_A);free(AE_B);
+        free(BE_A);free(BE_B);
+        free(AT_A);free(AT_B);
+        free(BT_A);free(BT_B);
+        free(CTE_A);free(CTE_B);
+        free(DTE_A);free(DTE_B);
     }
 
-    free(AE_A);free(AE_B);
-    free(BE_A);free(BE_B);
-    free(AT_A);free(AT_B);
-    free(BT_A);free(BT_B);
-    free(CTE_A);free(CTE_B);
-    free(DTE_A);free(DTE_B);
+    // Libero la memoria en el esclavo
+    if (miId == 1)
+    {
+      free(AE_B);
+      free(BE_B);
+      free(AT_B);
+      free(BT_B);
+      free(CTE_B);
+      free(DTE_B);
+    }
+
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Finalize();
 

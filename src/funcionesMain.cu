@@ -1,5 +1,38 @@
 #include "funcionesMain.h"
 
+int ObtenerSimetria(EntradaCuerpo* entradaCuerpo)
+{
+    // Buscamos la simetria
+    int simetria;
+
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+
+
+    if ((simXY != 1) && (simXZ != 1) && (simYZ != 1))
+        simetria = NO_SIMETRIA_IMPLICITA;
+    else if ((simXY == 1) && (simXZ != 1) && (simYZ != 1))
+        simetria = SIMETRIA_PLANO_0XY;
+    else if ((simXY != 1) && (simXZ == 1) && (simYZ != 1))
+        simetria = SIMETRIA_PLANO_0XZ;
+    else if ((simXY != 1) && (simXZ != 1) && (simYZ == 1))
+        simetria = SIMETRIA_PLANO_0YZ;
+    else if ((simXY == 1) && (simXZ == 1) && (simYZ != 1))
+        simetria = SIMETRIA_PLANOS_0XY_0XZ;
+    else if ((simXY == 1) && (simXZ != 1) && (simYZ == 1))
+        simetria = SIMETRIA_PLANOS_0XY_0YZ;
+    else if ((simXY != 1) && (simXZ == 1) && (simYZ == 1))
+        simetria = SIMETRIA_PLANOS_0XZ_0YZ;
+    else if ((simXY == 1) && (simXZ == 1) && (simYZ == 1))
+        simetria = SIMETRIA_TRES_PLANOS_COORDENADOS;
+    else
+        simetria = SIMETRIA_ERRONEA;
+
+    return simetria;
+}
+
+
 void CODIFICADA()
 {
     //* Declaracion de variables
@@ -299,6 +332,24 @@ void INTEGRAL()
     cuerpoA[HOST].tpcarFD = tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
     cuerpoA[HOST].tpcarFC = tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
     cuerpoA[HOST].tpcarPP = tpcarPP;// Flag de tipo de carga elástica. Peso propio
+    cuerpoA[HOST].tipoSimetria = ObtenerSimetria(&cuerpoA[HOST]);
+
+
+    // Calcula constantes
+    cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
+    cte2=1.0-2.0*nuT;
+    cte3=8.0*(1.0-nuT)*4.0*atan(1.0);
+    cte4=4.0*4.0*atan(1.0);
+    cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
+
+
+    cuerpoA[HOST].cte1 = cte1;// Constante en la integracion elastica
+    cuerpoA[HOST].cte2 = cte2;// Constante en la integracion elastica
+    cuerpoA[HOST].cte3 = cte3;// Constante en la integracion elastica
+    cuerpoA[HOST].cte4 = cte4;// Constante en la integracion termica
+    cuerpoA[HOST].cte5 = cte5;
+
+    cuerpoA[HOST].reg = reg;
 
     cuerpoA[HOST].enExcepcion = enExcepcion;
 
@@ -327,6 +378,15 @@ void INTEGRAL()
     cuerpoB[HOST].tpcarFD = tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
     cuerpoB[HOST].tpcarFC = tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
     cuerpoB[HOST].tpcarPP = tpcarPP;// Flag de tipo de carga elástica. Peso propio
+    cuerpoB[HOST].tipoSimetria = ObtenerSimetria(&cuerpoB[HOST]);
+
+    cuerpoB[HOST].cte1 = cte1;// Constante en la integracion elastica
+    cuerpoB[HOST].cte2 = cte2;// Constante en la integracion elastica
+    cuerpoB[HOST].cte3 = cte3;// Constante en la integracion elastica
+    cuerpoB[HOST].cte4 = cte4;// Constante en la integracion termica
+    cuerpoB[HOST].cte5 = cte5;
+
+    cuerpoB[HOST].reg = reg;
 
     cuerpoB[HOST].enExcepcion = enExcepcion;
     cuerpoB[HOST].nexT = nexB;
@@ -418,8 +478,25 @@ void INTEGRAL()
     tiniA = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Inicio calculo coeficientes.\n",tiniA);
 
-    COEFICIENTES(&cuerpoA[HOST]);if(enExcepcion==1)return;
-    
+
+    copiarEstructura(&cuerpoA[CUDA], &cuerpoA[HOST], cudaMemcpyHostToDevice);
+
+    EntradaCuerpo* entradaCuerpoEnDispositivo = pasarADispositivo(&cuerpoA[CUDA]);
+
+    host_printCheck_conT(cuerpoA[HOST].conT);
+    host_printCheck_exT(cuerpoA[HOST].exT);
+    //chivato<<<1,1>>>(entradaCuerpoEnDispositivo);
+    COEFICIENTES<<<1,1>>>(entradaCuerpoEnDispositivo);
+    cudaDeviceSynchronize();
+    printf("Error: %s\n",cudaGetErrorString(cudaGetLastError()));
+    //COEFICIENTES<<<1, 1>>>(entradaCuerpoEnDispositivo);
+    //cudaDeviceSynchronize();
+    cuerpoA[CUDA] = obtenerDesdeDispositivo(entradaCuerpoEnDispositivo);
+
+    copiarEstructura(&cuerpoA[HOST], &cuerpoA[CUDA], cudaMemcpyDeviceToHost);
+
+    printf("Valor de cte5: %.2f", cuerpoA[HOST].cte5);
+    if(cuerpoA[HOST].enExcepcion==1)return;
     tfinA = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Final calculo coeficientes.\n",tfinA);
     printf("\tTiempo Total= %f segundos\n",tfinA-tiniA);
@@ -435,8 +512,15 @@ void INTEGRAL()
     tiniB = clock()/CLOCKS_PER_SEC;
     printf("[%.3f] Inicio calculo coeficientes.\n",tiniB);
 
-    COEFICIENTES(&cuerpoB[HOST]);if(enExcepcion==1)return;
-    
+
+    copiarEstructura(&cuerpoB[CUDA], &cuerpoB[HOST], cudaMemcpyHostToDevice);
+    entradaCuerpoEnDispositivo = pasarADispositivo(&cuerpoB[CUDA]);
+    COEFICIENTES<<<1, 1>>>(entradaCuerpoEnDispositivo);if(enExcepcion==1)return;
+    cuerpoB[CUDA] = obtenerDesdeDispositivo(entradaCuerpoEnDispositivo);
+
+    copiarEstructura(&cuerpoB[HOST], &cuerpoB[CUDA], cudaMemcpyDeviceToHost);
+
+    if(cuerpoB[HOST].enExcepcion==1)return;
     //* Cierra ficheros
     
     //* Final del programa

@@ -192,6 +192,14 @@ void copiarEstructura(EntradaCuerpo* destino, EntradaCuerpo* origen, int direcci
     destino->tpcarFC = origen->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
     destino->tpcarPP = origen->tpcarPP;// Flag de tipo de carga elástica. Peso propio
 
+    destino->cte1 = origen->cte1;// Constante en la integracion elastica
+    destino->cte2 = origen->cte2;// Constante en la integracion elastica
+    destino->cte3 = origen->cte3;// Constante en la integracion elastica
+    destino->cte4 = origen->cte4;// Constante en la integracion termica
+    destino->cte5 = origen->cte5;// Constante en la integracion termoelastica
+
+    destino->reg = origen->reg;
+
     destino->enExcepcion = origen->enExcepcion;
 
     copiarMatriz((void**)destino->exT, (void**)origen->exT, sizeof(double), 5000, 3, direccion);

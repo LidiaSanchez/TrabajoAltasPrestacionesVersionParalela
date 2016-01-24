@@ -16,6 +16,7 @@
 //*                                                                            *
 //*                                                                            *
 //******************************************************************************
+__device__
 void GAUSS(EntradaCuerpo* entradaCuerpo, double punt[7][3]);
 
 #endif /* FUNCIONESD_H_ */

@@ -526,10 +526,10 @@ void SISTLOCAL()
 //*****************************************************************************
 
 
-
+__global__
 void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
 {
-
+    printf("COEFICIENTES!!\n");
     int  nd,el;	//Auxiliares
     int  i,j;
     double  extraux;
@@ -602,16 +602,23 @@ void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
     int &tipoSimetria = entradaCuerpo->tipoSimetria;
     char &intenum = entradaCuerpo->intenum;
 
+    double&  cte1 = entradaCuerpo->cte1;// Constante en la integracion elastica
+    double&  cte2 = entradaCuerpo->cte2;// Constante en la integracion elastica
+    double&  cte3 = entradaCuerpo->cte3;// Constante en la integracion elastica
+    double&  cte4 = entradaCuerpo->cte4;// Constante en la integracion termica
+    double&  cte5 = entradaCuerpo->cte5;// Constante en la integracion termoelastica
 
-    // Calcula constantes
-    cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
+    long int& reg = entradaCuerpo->reg;
+
+    // Los siguientes datos son constantes y están calculados previamente en el host.
+    /*cte1=16.0*4.0*atan(1.0)*GT*(1.0-nuT);
     cte2=1.0-2.0*nuT;
     cte3=8.0*(1.0-nuT)*4.0*atan(1.0);
     cte4=4.0*4.0*atan(1.0);
     cte5=alT*(1.0+nuT)/(8.0*4.0*atan(1.0)*(1.0-nuT));
 
 
-    tipoSimetria = ObtenerSimetria(entradaCuerpo);
+    tipoSimetria = ObtenerSimetria(entradaCuerpo);*/
 
     // Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
     for( el=1; el<=nelT; el++)
@@ -1437,37 +1444,6 @@ void COEFICIENTES(EntradaCuerpo * entradaCuerpo)
 
 }
 
-int ObtenerSimetria(EntradaCuerpo* entradaCuerpo)
-{
-    // Buscamos la simetria
-    int simetria;
-
-    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
-    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
-    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
-
-
-    if ((simXY != 1) && (simXZ != 1) && (simYZ != 1))
-        simetria = NO_SIMETRIA_IMPLICITA;
-    else if ((simXY == 1) && (simXZ != 1) && (simYZ != 1))
-        simetria = SIMETRIA_PLANO_0XY;
-    else if ((simXY != 1) && (simXZ == 1) && (simYZ != 1))
-        simetria = SIMETRIA_PLANO_0XZ;
-    else if ((simXY != 1) && (simXZ != 1) && (simYZ == 1))
-        simetria = SIMETRIA_PLANO_0YZ;
-    else if ((simXY == 1) && (simXZ == 1) && (simYZ != 1))
-        simetria = SIMETRIA_PLANOS_0XY_0XZ;
-    else if ((simXY == 1) && (simXZ != 1) && (simYZ == 1))
-        simetria = SIMETRIA_PLANOS_0XY_0YZ;
-    else if ((simXY != 1) && (simXZ == 1) && (simYZ == 1))
-        simetria = SIMETRIA_PLANOS_0XZ_0YZ;
-    else if ((simXY == 1) && (simXZ == 1) && (simYZ == 1))
-        simetria = SIMETRIA_TRES_PLANOS_COORDENADOS;
-    else
-        simetria = SIMETRIA_ERRONEA;
-
-    return simetria;
-}
 
 //*****************************************************************************
 //                                                                            *
@@ -2250,3 +2226,142 @@ void CHEINTE()
     return;
 }
 
+__global__ void chivato(EntradaCuerpo* entradaCuerpo)
+{
+    printf("Ha entrado en el chivato!!\n");
+    printf("COEFICIENTES!!\n");
+    int  nd,el;	//Auxiliares
+    int  i,j;
+    double  extraux;
+    double  AE1[3][3],AE2[3][3],AE3[3][3],AE4[3][3],AE5[3][3],AE6[3][3],AE7[3][3];
+    double  BE1[3][3],BE2[3][3],BE3[3][3],BE4[3][3],BE5[3][3],BE6[3][3],BE7[3][3];
+    double  AT1,AT2,AT3,AT4,AT5,AT6,AT7;
+    double  BT1,BT2,BT3,BT4,BT5,BT6,BT7;
+    double  C1[3],C2[3],C3[3],C4[3],C5[3],C6[3],C7[3];
+    double  D1[3][3],D2[3][3],D3[3][3],D4[3][3],D5[3][3],D6[3][3],D7[3][3];
+
+
+    // Aprovechamos que son punteros para direccionarlos a las matrices del cuerpo.
+    // Nos ahorra muchas modificaciones.
+    double** AE_T = entradaCuerpo->AE_T;
+    double** BE_T = entradaCuerpo->BE_T;
+    double** AT_T = entradaCuerpo->AT_T;
+    double** BT_T = entradaCuerpo->BT_T;
+    double** CTE_T = entradaCuerpo->CTE_T;
+    double** DTE_T = entradaCuerpo->DTE_T;
+
+
+    double &AT = entradaCuerpo->AT;
+    double &BT = entradaCuerpo->BT;
+
+    double AE[3][3];
+    double BE[3][3];
+    double DTE[3][3];
+    for (int i=0; i< 3; i++)
+        for(int j=0; j<3; j++)
+        {
+            AE[i][j] = entradaCuerpo->AE[i][j];
+            BE[i][j] = entradaCuerpo->BE[i][j];
+            DTE[i][j] = entradaCuerpo->DTE[i][j];
+        }
+
+    double * CTE = entradaCuerpo->CTE;
+    double * DTTE = entradaCuerpo->DTTE;
+
+
+    // Reemplazamos las referencias globales de variables.h por las del cuerpo. No son punteros, pero el '&' nos permite
+    // vincular variables en C++:
+    int &nelT = entradaCuerpo->nelT;
+    double &GT = entradaCuerpo->GT;
+    double &nuT = entradaCuerpo->nuT;
+    double &alT = entradaCuerpo->alT;
+
+
+    double ** exT = entradaCuerpo->exT;
+    int    ** conT = entradaCuerpo->conT;
+    double ** ndT = entradaCuerpo->ndT;
+    double ** locT = entradaCuerpo->locT;
+
+    double * ndCol = entradaCuerpo->ndCol;
+    double ** extr = entradaCuerpo->extr;
+
+    int&  simXY = entradaCuerpo->simXY;// Flag de simetría respecto del plano xOy
+    int&  simXZ = entradaCuerpo->simXZ;// Flag de simetría respecto del plano xOz
+    int&  simYZ = entradaCuerpo->simYZ;// Flag de simetría respecto del plano yOz
+    int&  tpproE = entradaCuerpo->tpproE;// Flag de tipo de problema elastico
+    int&  tpproT = entradaCuerpo->tpproT;// Flag de tipo de problema termico
+    int&  tpproTE = entradaCuerpo->tpproTE;// Flag de tipo de problema termoelastico
+    int&  tpcarFP = entradaCuerpo->tpcarFP;// Flag de tipo de carga térmica. Fuentes puntuales
+    int&  tpcarFL = entradaCuerpo->tpcarFL;// Flag de tipo de carga térmica. Fuentes lineales
+    int&  tpcarFD = entradaCuerpo->tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
+    int&  tpcarFC = entradaCuerpo->tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
+    int&  tpcarPP = entradaCuerpo->tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    int& enExcepcion = entradaCuerpo->enExcepcion;
+
+    int &tipoSimetria = entradaCuerpo->tipoSimetria;
+    char &intenum = entradaCuerpo->intenum;
+
+    double&  cte1 = entradaCuerpo->cte1;// Constante en la integracion elastica
+    double&  cte2 = entradaCuerpo->cte2;// Constante en la integracion elastica
+    double&  cte3 = entradaCuerpo->cte3;// Constante en la integracion elastica
+    double&  cte4 = entradaCuerpo->cte4;// Constante en la integracion termica
+    double&  cte5 = entradaCuerpo->cte5;// Constante en la integracion termoelastica
+
+    long int& reg = entradaCuerpo->reg;
+
+
+    device_printCheck_conT(conT);
+    device_printCheck_exT(exT);
+
+    int numeroIteracionesPorThread = nelT / THREADS_PER_BLOCK;
+    int iteracionesRestantes = 0;
+
+    if (threadIdx.x == THREADS_PER_BLOCK-1)
+        iteracionesRestantes = nelT % THREADS_PER_BLOCK;
+    int from = threadIdx.x * numeroIteracionesPorThread+1;
+    int to =  from + numeroIteracionesPorThread + iteracionesRestantes;
+
+
+
+    //tipoSimetria = ObtenerSimetria(entradaCuerpo);
+    // Para todos los elementos COMIENZA EL PRIMER ELEMENTO (SOBRE EL QUE SE INTEGRA)
+    for( el=from; el<=to; el++)
+    {
+
+        ndCol[0] = 2;
+        ndCol[1] = 3;
+        ndCol[2] = 4;
+        // Para todos los nodos COMIENZA EL PRIMER NODO (DESDE EL QUE SE INTEGRA)
+        for (nd = 1; nd <= /*nelT*/ 10; nd++)
+        {
+
+            //printf("[Thread %d] subiteration %d init\n", threadIdx.x, nd);
+
+            // Asigna punto de colocacion
+            for (i = 1; i <= 3; i++)
+            {
+                ndCol[i - 1] = ndT[nd - 1][i - 1];
+            }
+
+            // Asigna tipo de integral
+            //intenum = el != nd;
+            // Asigna extremos
+            for (i = 1; i <= 3; i++)
+            {
+                for (j = 1; j <= 3; j++)
+                {
+                    int exTi = conT[el - 1][i - 1] - 1;
+                    int exTj = j - 1;
+
+                    printf("ext coords: %d, %d\n", exTi, exTj);
+                    extr[i - 1][j - 1] = exT[exTi][exTj];
+                    //extr[i - 1][j - 1] = 2;
+                }
+            }
+
+            //CHIVATO2(entradaCuerpo, AE, BE, &AT, &BT, CTE, DTE);
+            //printf("[Thread %d] subiteration %d end\n", threadIdx.x, nd);
+        }
+    }
+}

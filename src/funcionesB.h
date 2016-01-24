@@ -30,7 +30,7 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod);
 //*               integracion apropiada                                        *
 //*                                                                            *
 //******************************************************************************
-
+__device__
 void INTEGRA(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double * CT,double DT[3][3]);
 //******************************************************************************
 //*                                                                            *
@@ -41,7 +41,7 @@ void INTEGRA(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],dou
 //*               elasticos                                                    *
 //*                                                                            *
 //******************************************************************************
-
+__device__
 void TRANSFORMA(EntradaCuerpo* entradaCuerpo, double AETR[3][3],double BETR[3][3], int* punteroA_el);
 //******************************************************************************
 //*                                                                            *
@@ -51,9 +51,11 @@ void TRANSFORMA(EntradaCuerpo* entradaCuerpo, double AETR[3][3],double BETR[3][3
 //*  Description: Almacena los coeficientes de integracion                     *
 //*                                                                            *
 //******************************************************************************
-
+__device__
 void ALMACENA(int* punteroA_el,int* punteroA_nd, EntradaCuerpo* entradaCuerpo,double** AE_T,double** BE_T,double** AT_T,double** BT_T,double** CTE_T,double** DTE_T);
 
+__device__
+void CHIVATO2(EntradaCuerpo* entradaCuerpo, double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double * CT,double DT[3][3]);
 
 #endif /* FUNCIONESB_H_ */
 

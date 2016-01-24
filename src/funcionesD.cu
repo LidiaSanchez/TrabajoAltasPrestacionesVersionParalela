@@ -1,5 +1,5 @@
 #include "funcionesD.h"
-
+__device__
 void GAUSS(EntradaCuerpo* entradaCuerpo, double punt[7][3])
 {
     //* Declaracion de variables

@@ -1,6 +1,7 @@
 #include "funcionesPersonales.h"
 #include "variables.h"
 
+#include "funcionesCheck.h"
 #include "funcionesB.h"
 #include "funcionesC.h"
 #include "funcionesD.h"
@@ -89,7 +90,7 @@ void SISTLOCAL();
 //********************************* NOTA ***************************************
 //*    ---  Se integra desde el nodo   "nd"   sobre el elemento   "el"  ---    *
 //******************************************************************************
-
+__global__
 void COEFICIENTES(EntradaCuerpo* entradaCuerpo);
 
 //******************************************************************************
@@ -150,6 +151,6 @@ void CHETRAC();
 void CHEINTE();
 
 
-int ObtenerSimetria(EntradaCuerpo* entradaCuerpo);
+__global__ void chivato(EntradaCuerpo* entradaCuerpo);
 #endif /* FUNCIONESA_H_ */
 

@@ -18,7 +18,7 @@
 //*                                                                                      *
 //*                                                                                      *
 //****************************************************************************************
-
+__device__
 void ANALITICA(EntradaCuerpo* entradaCuerpo, double AEA[3][3],double BEA[3][3],double* punteroA_ATA,double* punteroA_BTA,double * CTEA,double DTEA[3][3],double * n,double * bar);
 
 
@@ -45,7 +45,7 @@ void ANALITICA(EntradaCuerpo* entradaCuerpo, double AEA[3][3],double BEA[3][3],d
 //*                               2                                            *
 //*                                                                            *
 //******************************************************************************
-
+__device__
 void SUBDIVIDE(double extrs[4][3],double subextr[4][4][3]);
 
 //****************************************************************************************
@@ -58,7 +58,7 @@ void SUBDIVIDE(double extrs[4][3],double subextr[4][4][3]);
 //*                                                                                      *
 //*                                                                                      *
 //****************************************************************************************
-
+__device__
 void NUMERICA(EntradaCuerpo* entradaCuerpo, double AEN[3][3],double BEN[3][3],double* punteroA_ATN,double* punteroA_BTN,double * CTEN,double DTEN[3][3],double * n,double* punteroA_distancia);
 #endif /* FUNCIONESC_H_ */
 

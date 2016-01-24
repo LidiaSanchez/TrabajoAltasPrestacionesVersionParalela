@@ -1,5 +1,6 @@
 #include "funcionesPersonales.h"
 #include "funcionesCuda.h"
+#include "funcionesCheck.h"
 #include "variables.h"
 
 #include "funcionesA.h"
@@ -11,6 +12,9 @@
 
 #ifndef FUNCIONESMAIN_H_
 #define FUNCIONESMAIN_H_
+
+int ObtenerSimetria(EntradaCuerpo* entradaCuerpo);
+
 
 //******************************************************************************
 //*                                                                            *

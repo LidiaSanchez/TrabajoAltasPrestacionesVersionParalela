@@ -20,7 +20,7 @@
 
 #define MEMCPY_HOST_TO_HOST 0
 #define BLOCKS_PER_PROCESS 2
-#define THREADS_PER_BLOCK 4
+#define THREADS_PER_BLOCK 10
 
 #define FICHERO_ENTRADA_COMPLETA "datos/EntradaCompleta.dat"
 #define FICHERO_TERM "datos/term.dat"
@@ -92,6 +92,14 @@ typedef struct EntradaCuerpo
     int  tpcarFD;// Flag de tipo de carga térmica. Fuentes distribuidas
     int  tpcarFC;// Flag de tipo de carga elástica. Fuerza centrífuga
     int  tpcarPP;// Flag de tipo de carga elástica. Peso propio
+
+    double  cte1;// Constante en la integracion elastica
+    double  cte2;// Constante en la integracion elastica
+    double  cte3;// Constante en la integracion elastica
+    double  cte4;// Constante en la integracion termica
+    double  cte5;// Constante en la integracion termoelastica
+
+    long int  reg;
 
     int enExcepcion;
 

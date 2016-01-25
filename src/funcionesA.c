@@ -1922,8 +1922,6 @@ void GAUSS_SOLU()
     //enddo
     //close(unit=out20)
 
-    // CPU y GPU: indican que método utilizar.
-    int CPU = 0, GPU = 1;
     printf("MAGMA INIT\n");
 
     // Inicialización de MAGMA
@@ -1945,20 +1943,20 @@ void GAUSS_SOLU()
         magma_int_t info = 0;
 
         // Asignamos memoria a los vectones.
-        magma_dmalloc_cpu(&A, test * test);
-        magma_dmalloc_cpu(&B, test);
-        magma_imalloc_cpu(&ipiv, test);
+        magma_dmalloc_cpu(&A, nT * nT);
+        magma_dmalloc_cpu(&B, nT);
+        magma_imalloc_cpu(&ipiv, nT);
 
         // Convertimos la matriz de coeficientes en un vector.
-        for(i=0; i < test; i++) {
-            for(j = 0; j < test; j++) {
+        for(i=0; i < nT; i++) {
+            for(j = 0; j < nT; j++) {
                 A[cnt++] = a[i][j];
             }
         }
 
         // Copiamos la matriz de términos independientes a una nueva matriz,
         // puesto que el método colocará aquí las soluciones X.
-        for(i=0; i < test; i++) {
+        for(i=0; i < nT; i++) {
             B[i] = b[i];
         }
 
@@ -1966,7 +1964,7 @@ void GAUSS_SOLU()
         clock_t startCPU = clock();
 
         // Ejecutamos el método de resolución.
-        magma_dgesv( test, 1, A, test, ipiv, B, test, &info );
+        magma_dgesv( nT, 1, A, nT, ipiv, B, nT, &info );
 
         // Almacenamos el tiempo final.
         int msec = (clock() - startCPU) * 1000 / CLOCKS_PER_SEC;
@@ -1980,7 +1978,7 @@ void GAUSS_SOLU()
 
         // Imprimimos el vector de soluciones.
         printf("Vector x magma: \n");
-        for( i=0; i< test; i++) {
+        for( i=0; i< nT; i++) {
             printf("%lf ", B[i]);
         }
         printf("\n");
@@ -2007,34 +2005,34 @@ void GAUSS_SOLU()
         magma_int_t infoGPU = 0;
 
         // Asignamos memoria a los vectones.
-        magma_dmalloc_cpu(&ACPU, test * test);
-        magma_dmalloc_cpu(&BCPU, test);
-        magma_dmalloc(&AGPU, test * test);
-        magma_dmalloc(&BGPU, test);
-        magma_imalloc_cpu(&ipivGPU, test);
+        magma_dmalloc_cpu(&ACPU, nT * nT);
+        magma_dmalloc_cpu(&BCPU, nT);
+        magma_dmalloc(&AGPU, nT * nT);
+        magma_dmalloc(&BGPU, nT);
+        magma_imalloc_cpu(&ipivGPU, nT);
 
         // Convertimos la matriz de coeficientes en un vector.
-        for(i=0; i < test; i++) {
-            for(j = 0; j < test; j++) {
+        for(i=0; i < nT; i++) {
+            for(j = 0; j < nT; j++) {
                 ACPU[cnt++] = a[i][j];
             }
         }
 
         // Copiamos la matriz de términos independientes a una nueva matriz,
         // puesto que el método colocará aquí las soluciones X.
-        for(i=0; i < test; i++) {
+        for(i=0; i < nT; i++) {
             BCPU[i] = b[i];
         }
 
         // Copiamos los vectores a la memoria de la gráfica.
-        magma_dsetmatrix(test, test, ACPU, test, AGPU, test);
-        magma_dsetmatrix(test, 1, BCPU, test, BGPU, test);
+        magma_dsetmatrix(nT, nT, ACPU, nT, AGPU, nT);
+        magma_dsetmatrix(nT, 1, BCPU, nT, BGPU, nT);
 
         // Almacenamos el tiempo actual.
         clock_t startGPU = clock();
 
         // Ejecutamos el método de resolución.
-        magma_dgesv_gpu( test, 1, AGPU, test, ipivGPU, BGPU, test, &infoGPU );
+        magma_dgesv_gpu( nT, 1, AGPU, nT, ipivGPU, BGPU, nT, &infoGPU );
 
         // Almacenamos el tiempo final.
         int msec = (clock() - startGPU) * 1000 / CLOCKS_PER_SEC;
@@ -2044,12 +2042,12 @@ void GAUSS_SOLU()
             fprintf( stderr, "magma_dgesv failed with info=%d\n", infoGPU );
         } else {
             // Traemos los vectores de la gráfica de vuelta a los vectores originales.
-            magma_dgetmatrix(test, test, AGPU, test, ACPU, test);
-            magma_dgetmatrix(test, 1, BGPU, test, BCPU, test);
+            magma_dgetmatrix(nT, nT, AGPU, nT, ACPU, nT);
+            magma_dgetmatrix(nT, 1, BGPU, nT, BCPU, nT);
 
             // Imprimimos el vector de soluciones.
             printf("Vector x magma: \n");
-            for( i=0; i< test; i++) {
+            for( i=0; i< nT; i++) {
                 printf("%lf ", BCPU[i]);
             }
             printf("\n");

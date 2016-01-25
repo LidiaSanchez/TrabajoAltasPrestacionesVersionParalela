@@ -9,8 +9,13 @@
 #include "magma.h"
 #include "magma_lapack.h"
 
+#include <time.h>
+
 #ifndef FUNCIONESA_H_
 #define FUNCIONESA_H_
+
+#define CPU 1
+#define GPU 1
 
 //******************************************************************************
 //*                                                                            *

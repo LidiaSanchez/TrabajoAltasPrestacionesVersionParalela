@@ -17,7 +17,7 @@ Iván de Paz Centeno (@ipazce00)
 LIBRERÍA PROBADA | MÉTODO UTILIZADO | Nº PROCESOS | TIEMPO COEFICIENTES | TIEMPO ECUACIONES | TIEMPO TOTAL
 ---------------- | ---------------- | ----------- | ------------------- | ----------------- | ------------
 Versión inicial | Sin modificaciones | 1 | 17 segundos | 440 segundos | 457 segundos
-NVCC | Adaptado para compilar en nvcc | 1 | 7 segundos | 240 segundos | 247 segundos
+NVCC | Adaptado para compilar en nvcc | 1 | 5 segundos | 337 segundos | 342 segundos
 NVCC | Pasar información a una estructura y volcarlo en el dispositivo para usar bloques y threads  | 2 Bloques x 10 Threads | -- | --
 
 

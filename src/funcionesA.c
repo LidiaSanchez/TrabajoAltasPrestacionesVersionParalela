@@ -1891,6 +1891,7 @@ void MONTAJETER()
 
     return;
 }
+
 //******************************************************************************
 //*                                                                            *
 //*  Input:                                                                    *
@@ -1921,6 +1922,154 @@ void GAUSS_SOLU()
     //enddo
     //close(unit=out20)
 
+    // CPU y GPU: indican que método utilizar.
+    int CPU = 0, GPU = 1;
+    printf("MAGMA INIT\n");
+
+    // Inicialización de MAGMA
+    magma_init();
+
+    if(CPU) {
+        printf("MAGMA con CPU...\n");
+
+        // Contandor para crear un vector a partir de la matriz A.
+        int cnt = 0;
+
+        // Vectores A y B necesarios para la resolución por el método LU.
+        double *A, *B;
+
+        // Buffer para almacenar los pivores.
+        magma_int_t *ipiv;
+
+        // Almacena el estado de la ejecución del método de resolución.
+        magma_int_t info = 0;
+
+        // Asignamos memoria a los vectones.
+        magma_dmalloc_cpu(&A, test * test);
+        magma_dmalloc_cpu(&B, test);
+        magma_imalloc_cpu(&ipiv, test);
+
+        // Convertimos la matriz de coeficientes en un vector.
+        for(i=0; i < test; i++) {
+            for(j = 0; j < test; j++) {
+                A[cnt++] = a[i][j];
+            }
+        }
+
+        // Copiamos la matriz de términos independientes a una nueva matriz,
+        // puesto que el método colocará aquí las soluciones X.
+        for(i=0; i < test; i++) {
+            B[i] = b[i];
+        }
+
+        // Almacenamos el tiempo actual.
+        clock_t startCPU = clock();
+
+        // Ejecutamos el método de resolución.
+        magma_dgesv( test, 1, A, test, ipiv, B, test, &info );
+
+        // Almacenamos el tiempo final.
+        int msec = (clock() - startCPU) * 1000 / CLOCKS_PER_SEC;
+
+        // Comprobamos si se ha ejecutado correctamente.
+        if ( info != 0 ) {
+            fprintf( stderr, "magma_dgesv failed with info=%d\n", info );
+        } else {
+            printf("Time taken %d seconds %d milliseconds\n\n", msec/1000, msec%1000);
+        }
+
+        // Imprimimos el vector de soluciones.
+        printf("Vector x magma: \n");
+        for( i=0; i< test; i++) {
+            printf("%lf ", B[i]);
+        }
+        printf("\n");
+
+        // Liberamos la memoria.
+        magma_free_cpu( A );
+        magma_free_cpu( B );
+        magma_free_cpu( ipiv );
+    }
+
+    if(GPU) {
+        printf("MAGMA con GPU...\n");
+
+        // Contandor para crear un vector a partir de la matriz A.
+        int cnt = 0;
+
+        // Vectores ACPU, BCPU, AGPU y BCPU necesarios para la resolución por el método LU 
+        double  *ACPU, *BCPU, *AGPU, *BGPU;
+
+        // Buffer para almacenar los pivores.
+        magma_int_t *ipivGPU;
+
+        // Almacena el estado de la ejecución del método de resolución.
+        magma_int_t infoGPU = 0;
+
+        // Asignamos memoria a los vectones.
+        magma_dmalloc_cpu(&ACPU, test * test);
+        magma_dmalloc_cpu(&BCPU, test);
+        magma_dmalloc(&AGPU, test * test);
+        magma_dmalloc(&BGPU, test);
+        magma_imalloc_cpu(&ipivGPU, test);
+
+        // Convertimos la matriz de coeficientes en un vector.
+        for(i=0; i < test; i++) {
+            for(j = 0; j < test; j++) {
+                ACPU[cnt++] = a[i][j];
+            }
+        }
+
+        // Copiamos la matriz de términos independientes a una nueva matriz,
+        // puesto que el método colocará aquí las soluciones X.
+        for(i=0; i < test; i++) {
+            BCPU[i] = b[i];
+        }
+
+        // Copiamos los vectores a la memoria de la gráfica.
+        magma_dsetmatrix(test, test, ACPU, test, AGPU, test);
+        magma_dsetmatrix(test, 1, BCPU, test, BGPU, test);
+
+        // Almacenamos el tiempo actual.
+        clock_t startGPU = clock();
+
+        // Ejecutamos el método de resolución.
+        magma_dgesv_gpu( test, 1, AGPU, test, ipivGPU, BGPU, test, &infoGPU );
+
+        // Almacenamos el tiempo final.
+        int msec = (clock() - startGPU) * 1000 / CLOCKS_PER_SEC;
+
+        // Comprobamos si se ha ejecutado correctamente.
+        if ( infoGPU != 0 ) {
+            fprintf( stderr, "magma_dgesv failed with info=%d\n", infoGPU );
+        } else {
+            // Traemos los vectores de la gráfica de vuelta a los vectores originales.
+            magma_dgetmatrix(test, test, AGPU, test, ACPU, test);
+            magma_dgetmatrix(test, 1, BGPU, test, BCPU, test);
+
+            // Imprimimos el vector de soluciones.
+            printf("Vector x magma: \n");
+            for( i=0; i< test; i++) {
+                printf("%lf ", BCPU[i]);
+            }
+            printf("\n");
+
+            printf("Time taken %d seconds %d milliseconds\n\n", msec/1000, msec%1000);
+        }
+
+        // Liberamos la memoria.
+        magma_free_cpu( ACPU );
+        magma_free_cpu( BCPU );
+        magma_free_cpu( ipivGPU );
+        magma_free( AGPU );
+        magma_free( BGPU );
+    }
+
+    // Finalizamos de MAGMA
+    magma_finalize();
+    
+    printf("NO MORE MAGMA\n");
+
     //MATRIZ AMPLIADA
     for( i=1; i<=nT; i++)        
     {
@@ -1931,6 +2080,7 @@ void GAUSS_SOLU()
     {
         x[i-1]=0.0;
     }
+
     //busqueda del pivote
     for( i=1; i<=nT-1; i++)        
     {
@@ -1986,8 +2136,14 @@ void GAUSS_SOLU()
     //enddo
     //close(unit=out20)
 
-    printf("fin gaussssssssss\n");
+    printf("Vector x: \n");
+    for( i=0; i< nT; i++) {
+        printf("%lf ", x[i]);
+    }
+    printf("\n");
 
+    printf("fin gaussssssssss\n");
+    //exit(0);
     return;
 }
 //******************************************************************************

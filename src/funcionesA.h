@@ -5,6 +5,10 @@
 #include "funcionesC.h"
 #include "funcionesD.h"
 
+#include "cublas_v2.h"
+#include "magma.h"
+#include "magma_lapack.h"
+
 #ifndef FUNCIONESA_H_
 #define FUNCIONESA_H_
 

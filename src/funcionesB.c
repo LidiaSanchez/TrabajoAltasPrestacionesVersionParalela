@@ -58,6 +58,8 @@ void CODIGOS(int* punteroA_ndInicial,int* punteroA_ndFinal,int* punteroA_tpCod)
 //*                                                                            *
 //******************************************************************************
 
+#if 0
+
 void INTEGRA(int* punteroA_intenum,double AET[3][3],double BET[3][3],double* punteroA_ATT,double* punteroA_BTT,double CT[3],double DT[3][3])
 {
     //* Declaracion de variables
@@ -441,3 +443,4 @@ void ALMACENA(int* punteroA_el,int* punteroA_nd,double** AE_T,double** BE_T,doub
 
 }
 
+#endif

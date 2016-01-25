@@ -5,6 +5,8 @@
 #include "funcionesC.h"
 #include "funcionesD.h"
 
+#include "kernels.h"
+
 #ifndef FUNCIONESA_H_
 #define FUNCIONESA_H_
 
